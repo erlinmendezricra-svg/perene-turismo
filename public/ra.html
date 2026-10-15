@@ -23,16 +23,27 @@
       background: #000;
     }
 
-    .fondo-camara {
+    /* La cámara de AR.js se ve completa */
+    a-scene {
       position: absolute;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      object-fit: cover;
       z-index: 1;
-      display: block;
+      background: transparent;
+    }
+    .a-enter-vr, .arjs-loader { display: none !important; }
+    .arjs-video {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      object-fit: cover !important;
+      z-index: 1 !important;
     }
 
     .btn-volver {
@@ -49,6 +60,7 @@
       font-size: 0.9rem;
       border: none;
       cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
     .mensaje-guia {
@@ -88,6 +100,7 @@
       font-size: 0.8rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       touch-action: manipulation;
+      z-index: 999;
     }
     .btn:active { transform: scale(0.95); }
 
@@ -130,25 +143,11 @@
       background: #16a34a; 
       outline: 2px solid white;
     }
-
-    a-scene {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      z-index: 10;
-      background: transparent;
-    }
-    .a-enter-vr, .arjs-loader, .arjs-video { display: none !important; }
   </style>
 </head>
 <body>
-  <video class="fondo-camara" autoplay playsinline muted id="camara"></video>
-
   <a href="/" class="btn-volver">← Volver</a>
-  <div class="mensaje-guia">📷 Apunta al marcador completo</div>
+  <div class="mensaje-guia">📷 Apunta al marcador para ver el caballo</div>
 
   <div class="panel-botones">
     <button class="btn btn-anim" id="btnAnimacion">🔄 Animación</button>
@@ -168,7 +167,7 @@
       <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- CABALLO: BAJADO, COMPLETO, QUIETO -->
+    <!-- CABALLO COMPLETO, CENTRADO, QUIETO -->
     <a-entity 
       id="entidadModelo"
       scale="0.22 0.22 0.22" 
@@ -184,15 +183,6 @@
   <script>
     const modeloEntidad = document.getElementById('entidadModelo');
     const btnAnimacion = document.getElementById('btnAnimacion');
-
-    // === ACTIVAR CÁMARA ===
-    navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } 
-    })
-    .then(stream => {
-      document.getElementById('camara').srcObject = stream;
-    })
-    .catch(err => console.log('Cámara:', err));
 
     // === CAMBIAR ANIMACIÓN ===
     btnAnimacion.addEventListener('click', () => {
@@ -252,7 +242,7 @@
           btnGrabar.classList.add('grabando');
           btnGrabar.textContent = '⏹ Detener';
         } catch (e) {
-          alert('Permite grabar pantalla');
+          alert('Permite grabar pantalla cuando el navegador lo pide');
         }
       } else {
         grabadora.stop();
