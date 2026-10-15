@@ -23,7 +23,7 @@
       padding: 0 !important;
     }
 
-    /* ===== SOLUCIÓN PRINCIPAL: VIDEO A PANTALLA COMPLETA ===== */
+    /* SOLUCIÓN CLAVE: expandir el video más allá de su tamaño normal */
     .arjs-video {
       position: absolute !important;
       top: 0 !important;
@@ -32,12 +32,10 @@
       height: 100vh !important;
       height: 100dvh !important;
       object-fit: cover !important;
-      transform: none !important;
+      transform: scale(1.8) !important;
       transform-origin: center center !important;
       z-index: 1 !important;
       display: block !important;
-      margin: 0 !important;
-      padding: 0 !important;
     }
 
     a-scene {
@@ -49,11 +47,9 @@
       height: 100dvh !important;
       z-index: 2 !important;
       background: transparent !important;
-      margin: 0 !important;
-      padding: 0 !important;
     }
 
-    .a-enter-vr, .arjs-loader, .arjs-debug { display: none !important; }
+    .a-enter-vr, .arjs-loader { display: none !important; }
 
     .btn-volver {
       position: fixed;
@@ -69,7 +65,6 @@
       font-size: 0.9rem;
       border: none;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
     .mensaje-guia {
@@ -109,6 +104,7 @@
       font-size: 0.8rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       touch-action: manipulation;
+      z-index: 999;
     }
     .btn:active { transform: scale(0.95); }
     .btn-anim { background: #2563eb; color: white; }
@@ -163,16 +159,17 @@
     <button class="animal-opcion activo" data-modelo="/ar/logo.glb">Caballo</button>
   </div>
 
-  <!-- CAMBIO CLAVE: detectionMode = mono → pantalla completa sin recuadro -->
+  <!-- VOLVEMOS A mono_and_matrix → la cámara funciona correctamente -->
+  <!-- scale(1.8) en CSS expande el video a toda la pantalla -->
   <a-scene
-    arjs="sourceType: webcam; detectionMode: mono; matrixCodeType: 3x3; debugUIEnabled: false;"
+    arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
 
     <a-assets timeout="30000">
       <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- CABALLO COMPLETO, CENTRADO -->
+    <!-- CABALLO COMPLETO Y CENTRADO -->
     <a-entity
       id="entidadModelo"
       scale="0.22 0.22 0.22"
