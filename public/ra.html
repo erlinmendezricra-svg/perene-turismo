@@ -133,7 +133,7 @@
     <button class="btn btn-grabar" id="btnGrabar">Grabar</button>
   </div>
 
-  <!-- ✅ RUTA CORRECTA: /ar/leona.glb -->
+  <!-- ✅ SIN MARCADOR — LEONA DIRECTA, VISIBLE Y CERCA -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
@@ -142,7 +142,7 @@
       <a-asset-item id="leona" src="/ar/leona.glb"></a-asset-item>
     </a-assets>
 
-    <!-- 🦁 GRANDE, CERCA, A LA ALTURA DE LA VISTA -->
+    <!-- 🦁 MUY GRANDE, MUY CERCA → NO SE PIERDE -->
     <a-entity
       id="entidadLeona"
       scale="2 2 2"
