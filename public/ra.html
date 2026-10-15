@@ -25,7 +25,6 @@
       background: #000;
     }
 
-    /* CÁMARA OCUPA TODO SIN RECORTES */
     .fondo-camara {
       position: absolute;
       top: 0;
@@ -38,7 +37,6 @@
       display: block;
     }
 
-    /* BOTÓN VOLVER */
     .btn-volver {
       position: fixed;
       top: max(10px, env(safe-area-inset-top));
@@ -56,7 +54,6 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    /* MENSAJE GUÍA */
     .mensaje-guia {
       position: fixed;
       top: max(10px, env(safe-area-inset-top));
@@ -73,7 +70,6 @@
       line-height: 1.3;
     }
 
-    /* PANEL DE BOTONES ABAJO */
     .panel-botones {
       position: fixed;
       bottom: max(15px, env(safe-area-inset-bottom));
@@ -111,7 +107,6 @@
       50% { opacity: 0.6; }
     }
 
-    /* LISTA DE ANIMALES */
     .lista-animales {
       position: fixed;
       bottom: calc(max(70px, env(safe-area-inset-bottom) + 60px));
@@ -143,7 +138,6 @@
       outline: 2px solid white;
     }
 
-    /* ESCENA PANTALLA COMPLETA */
     a-scene {
       position: absolute;
       top: 0;
@@ -161,72 +155,97 @@
   <video class="fondo-camara" autoplay playsinline muted id="camara"></video>
 
   <a href="/" class="btn-volver">← Volver</a>
-  <div class="mensaje-guia">📷 Apunta al marcador para ver el modelo</div>
+  <div class="mensaje-guia" id="estadoCarga">📷 Cargando modelo...</div>
 
-  <!-- PANEL DE BOTONES -->
   <div class="panel-botones">
     <button class="btn btn-anim" id="btnAnimacion">🔄 Animación</button>
     <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar</button>
     <button class="btn btn-animal" id="btnAnimal">🐾 Animal</button>
   </div>
 
-  <!-- LISTA DE ANIMALES -->
   <div class="lista-animales" id="listaAnimales">
     <button class="animal-opcion activo" data-modelo="/ar/logo.glb">Caballo</button>
-    <!-- Agrega más: <button class="animal-opcion" data-modelo="/ar/nombre.glb">Nombre</button> -->
   </div>
 
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
 
-    <a-assets>
+    <a-assets timeout="30000">
       <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- MODELO CENTRADO, COMPLETO Y ESTABLE -->
     <a-entity 
       id="entidadModelo"
       scale="0.35 0.35 0.35" 
       position="0 -0.3 -2.2"
       gltf-model="#modelo-actual"
-      animation-mixer="clip: *; loop: repeat; timeScale: 1">
+      animation-mixer="clip: *; loop: repeat; timeScale: 1"
+      visible="false">
     </a-entity>
 
     <a-camera></a-camera>
   </a-scene>
 
   <script>
-    // === ACTIVAR CÁMARA PANTALLA COMPLETA ===
+    const estadoCarga = document.getElementById('estadoCarga');
+    const modeloEntidad = document.getElementById('entidadModelo');
+    const btnAnimacion = document.getElementById('btnAnimacion');
+    let indiceAnimacion = 0;
+    let cargado = false;
+
+    // === ACTIVAR CÁMARA ===
     navigator.mediaDevices.getUserMedia({ 
-      video: { 
-        facingMode: 'environment', 
-        width: { ideal: 1920 }, 
-        height: { ideal: 1080 } 
-      } 
+      video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } 
     })
-    .then(function(stream) {
-      const video = document.getElementById('camara');
-      video.srcObject = stream;
-      video.play();
+    .then(stream => {
+      document.getElementById('camara').srcObject = stream;
     })
-    .catch(function(err) {
-      console.log('Error de cámara:', err);
+    .catch(err => console.log('Cámara:', err));
+
+    // === DETECTAR CUANDO EL MODELO CARGA ===
+    modeloEntidad.addEventListener('model-loaded', () => {
+      cargado = true;
+      modeloEntidad.setAttribute('visible', 'true');
+      estadoCarga.textContent = '✅ Modelo listo - Apunta al marcador';
+      
+      // Mostrar animaciones disponibles
+      const mixer = modeloEntidad.components['animation-mixer'];
+      if (mixer && mixer.model && mixer.model.animations.length > 0) {
+        estadoCarga.textContent += ` (${mixer.model.animations.length} animaciones)`;
+      }
+      
+      setTimeout(() => {
+        estadoCarga.textContent = '📷 Apunta al marcador';
+      }, 3000);
     });
 
-    // === CAMBIAR ANIMACIÓN ===
-    const btnAnimacion = document.getElementById('btnAnimacion');
-    const modeloEntidad = document.getElementById('entidadModelo');
-    let indiceAnimacion = 0;
+    modeloEntidad.addEventListener('model-error', () => {
+      estadoCarga.textContent = '❌ Error al cargar modelo';
+    });
 
-    btnAnimacion.addEventListener('click', function() {
-      const mixer = modeloEntidad.components['animation-mixer'];
-      if (!mixer) {
-        alert('Espera un momento a que cargue el modelo');
+    // === CAMBIAR ANIMACIÓN SIN DEMORA ===
+    btnAnimacion.addEventListener('click', () => {
+      if (!cargado) {
+        // Si no carga aún, cambiamos velocidad directamente
+        const velocidad = modeloEntidad.getAttribute('animation-mixer').timeScale || 1;
+        if (velocidad === 1) {
+          modeloEntidad.setAttribute('animation-mixer', 'timeScale', 0.5);
+          btnAnimacion.textContent = '🐢 Lenta';
+        } else if (velocidad === 0.5) {
+          modeloEntidad.setAttribute('animation-mixer', 'timeScale', 1.5);
+          btnAnimacion.textContent = '🐇 Rápida';
+        } else {
+          modeloEntidad.setAttribute('animation-mixer', 'timeScale', 1);
+          btnAnimacion.textContent = '🔄 Normal';
+        }
         return;
       }
 
-      const animaciones = Object.keys(mixer.model?.animations || {});
+      const mixer = modeloEntidad.components['animation-mixer'];
+      if (!mixer || !mixer.model) return;
+
+      const animaciones = mixer.model.animations || [];
       
       if (animaciones.length === 0) {
         const velocidad = modeloEntidad.getAttribute('animation-mixer').timeScale;
@@ -250,8 +269,8 @@
         btnAnimacion.textContent = '🔄 Todas';
       } else {
         const anim = animaciones[indiceAnimacion - 1];
-        modeloEntidad.setAttribute('animation-mixer', 'clip', anim);
-        btnAnimacion.textContent = '🎬 ' + anim.substring(0, 10);
+        modeloEntidad.setAttribute('animation-mixer', 'clip', anim.name);
+        btnAnimacion.textContent = '🎬 ' + anim.name.substring(0, 10);
       }
     });
 
@@ -259,40 +278,28 @@
     const btnGrabar = document.getElementById('btnGrabar');
     let grabando = false;
     let grabadora = null;
-    let flujoGrabacion = null;
 
-    btnGrabar.addEventListener('click', async function() {
+    btnGrabar.addEventListener('click', async () => {
       if (!grabando) {
         try {
-          flujoGrabacion = await navigator.mediaDevices.getDisplayMedia({
-            video: { cursor: 'always' },
-            audio: false
-          });
-          
-          grabadora = new MediaRecorder(flujoGrabacion, {
-            mimeType: 'video/webm'
-          });
-          
+          const flujo = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+          grabadora = new MediaRecorder(flujo);
           const trozos = [];
           grabadora.ondataavailable = e => e.data.size && trozos.push(e.data);
           grabadora.onstop = () => {
             const blob = new Blob(trozos, { type: 'video/webm' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = 'perene-turismo-' + new Date().toLocaleTimeString().replace(/:/g, '-') + '.webm';
+            a.href = URL.createObjectURL(blob);
+            a.download = 'perene-' + Date.now() + '.webm';
             a.click();
-            URL.revokeObjectURL(url);
-            flujoGrabacion.getTracks().forEach(t => t.stop());
+            flujo.getTracks().forEach(t => t.stop());
           };
-          
           grabadora.start();
           grabando = true;
           btnGrabar.classList.add('grabando');
           btnGrabar.textContent = '⏹ Detener';
-          
         } catch (e) {
-          alert('Permite grabar cuando el navegador lo pide');
+          alert('Permite grabar pantalla');
         }
       } else {
         grabadora.stop();
@@ -306,27 +313,20 @@
     const btnAnimal = document.getElementById('btnAnimal');
     const listaAnimales = document.getElementById('listaAnimales');
     const modeloActual = document.getElementById('modelo-actual');
-    const opcionesAnimales = document.querySelectorAll('.animal-opcion');
 
-    btnAnimal.addEventListener('click', function() {
+    btnAnimal.addEventListener('click', () => {
       listaAnimales.classList.toggle('mostrar');
     });
 
-    opcionesAnimales.forEach(boton => {
+    document.querySelectorAll('.animal-opcion').forEach(boton => {
       boton.addEventListener('click', function() {
-        opcionesAnimales.forEach(op => op.classList.remove('activo'));
+        document.querySelectorAll('.animal-opcion').forEach(op => op.classList.remove('activo'));
         this.classList.add('activo');
         
-        const ruta = this.getAttribute('data-modelo');
-        modeloActual.setAttribute('src', ruta);
-        
-        setTimeout(() => {
-          modeloEntidad.removeAttribute('gltf-model');
-          modeloEntidad.setAttribute('gltf-model', '#modelo-actual');
-        }, 150);
-        
-        listaAnimales.classList.remove('mostrar');
+        modeloActual.setAttribute('src', this.getAttribute('data-modelo'));
+        cargado = false;
         btnAnimal.textContent = '🐾 ' + this.textContent;
+        listaAnimales.classList.remove('mostrar');
       });
     });
   </script>
