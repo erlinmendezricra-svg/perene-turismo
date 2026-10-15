@@ -4,9 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta http-equiv="Permissions-Policy" content="camera=()">
   <title>Realidad Aumentada - Perené</title>
+  
+  <!-- Librerías cargadas correctamente -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -15,55 +19,75 @@
       overflow: hidden;
       margin: 0;
       padding: 0;
+      background: #000;
     }
-    body { background-color: transparent; }
 
     /* Botón Volver */
     .btn-volver {
       position: fixed;
-      top: 15px;
-      left: 15px;
+      top: 12px;
+      left: 12px;
       background: #006633;
       color: white !important;
-      padding: 10px 18px;
+      padding: 8px 14px;
       border-radius: 6px;
       text-decoration: none;
       font-weight: bold;
-      z-index: 10000;
-      font-size: 0.9rem;
+      z-index: 99999;
+      font-size: 0.85rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
     /* Mensaje de guía */
     .mensaje-guia {
       position: fixed;
-      top: 15px;
+      top: 12px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.75);
       color: white;
-      padding: 10px 18px;
+      padding: 8px 15px;
       border-radius: 20px;
-      font-size: 0.85rem;
-      z-index: 10000;
+      font-size: 0.8rem;
+      z-index: 99999;
       text-align: center;
       max-width: 85%;
+      line-height: 1.4;
     }
 
-    /* Asegurar que la cámara se vea */
+    /* Escena ocupa toda la pantalla */
     a-scene {
-      width: 100% !important;
-      height: 100% !important;
       position: absolute !important;
       top: 0 !important;
       left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background-color: transparent !important;
     }
-    .arjs-video, video, canvas {
+
+    /* Video de cámara visible y sin recortes */
+    .arjs-video, video {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
       width: 100% !important;
       height: 100% !important;
       object-fit: cover !important;
       display: block !important;
+      z-index: 1;
     }
+
+    canvas {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      z-index: 2;
+    }
+
+    /* Quitar botón de VR */
+    .a-enter-vr { display: none !important; }
   </style>
 </head>
 <body>
@@ -71,22 +95,42 @@
   
   <div class="mensaje-guia">📷 Apunta a la imagen del atractivo para ver la información</div>
 
-  <!-- ESCENA DE REALIDAD AUMENTADA -->
-  <a-scene 
-    embedded 
-    arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
-    vr-mode-ui="enabled: false">
-    
+  <a-scene
+    arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
+    vr-mode-ui="enabled: false"
+    renderer="antialias: true; logarithmicDepthBuffer: true;">
+
     <a-assets>
-      <!-- Aquí puedes poner tus imágenes o modelos -->
+      <!-- Aquí puedes agregar imágenes o modelos -->
     </a-assets>
 
     <!-- Tu contenido que aparece al detectar -->
-    <a-entity id="contenido-ra" position="0 0 0" scale="1 1 1">
-      <!-- Aquí van tus textos, imágenes o modelos que quieres mostrar -->
+    <a-entity id="ra-contenido">
+      <a-text
+        value="¡Atractivo Detectado!"
+        color="#ffffff"
+        align="center"
+        position="0 0.5 -1"
+        scale="0.5 0.5 0.5"
+        font="https://cdn.aframe.io/fonts/Exo2SemiBold.fnt">
+      </a-text>
     </a-entity>
 
     <a-camera position="0 0 0"></a-camera>
   </a-scene>
+
+  <!-- Pedir permiso de cámara automáticamente -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(function(stream) {
+          console.log('✅ Cámara activada');
+        })
+        .catch(function(err) {
+          console.log('❌ Error de cámara:', err);
+          alert('Por favor permite el acceso a la cámara cuando el navegador lo pide');
+        });
+    });
+  </script>
 </body>
 </html>
