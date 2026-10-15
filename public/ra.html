@@ -4,37 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Realidad Aumentada - Perené</title>
-  
+
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  
+
   <style>
-    * { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
     html, body {
       width: 100vw;
       height: 100vh;
       height: 100dvh;
       overflow: hidden;
-      margin: 0;
-      padding: 0;
       position: fixed;
       top: 0;
       left: 0;
       background: #000;
     }
 
-    /* La cámara de AR.js se ve completa */
+    /* ESCENA AR OCUPA TODA LA PANTALLA */
     a-scene {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
       z-index: 1;
       background: transparent;
     }
-    .a-enter-vr, .arjs-loader { display: none !important; }
+
+    /* VIDEO DE CÁMARA A PANTALLA COMPLETA */
     .arjs-video {
       position: absolute !important;
       top: 0 !important;
@@ -44,6 +48,25 @@
       height: 100dvh !important;
       object-fit: cover !important;
       z-index: 1 !important;
+      display: block !important;
+      transform: none !important;
+    }
+
+    /* ELIMINAR CARGA Y BOTONES VR */
+    .a-enter-vr,
+    .arjs-loader,
+    .a-canvas {
+      display: none !important;
+    }
+
+    /* CANVAS DE AFRAME ENCIMA DE LA CÁMARA */
+    .a-canvas {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      z-index: 2;
     }
 
     .btn-volver {
@@ -102,12 +125,30 @@
       touch-action: manipulation;
       z-index: 999;
     }
-    .btn:active { transform: scale(0.95); }
 
-    .btn-anim { background: #2563eb; color: white; }
-    .btn-grabar { background: #dc2626; color: white; }
-    .btn-animal { background: #f59e0b; color: #1f2937; }
-    .btn-grabar.grabando { background: #7f1d1d; animation: parpadeo 1s infinite; }
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-anim {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-grabar {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-animal {
+      background: #f59e0b;
+      color: #1f2937;
+    }
+
+    .btn-grabar.grabando {
+      background: #7f1d1d;
+      animation: parpadeo 1s infinite;
+    }
 
     @keyframes parpadeo {
       0%, 100% { opacity: 1; }
@@ -129,7 +170,11 @@
       justify-content: center;
       max-width: 92%;
     }
-    .lista-animales.mostrar { display: flex; }
+
+    .lista-animales.mostrar {
+      display: flex;
+    }
+
     .animal-opcion {
       background: #006633;
       color: white;
@@ -139,13 +184,15 @@
       cursor: pointer;
       font-size: 0.85rem;
     }
-    .animal-opcion.activo { 
-      background: #16a34a; 
+
+    .animal-opcion.activo {
+      background: #16a34a;
       outline: 2px solid white;
     }
   </style>
 </head>
 <body>
+
   <a href="/" class="btn-volver">← Volver</a>
   <div class="mensaje-guia">📷 Apunta al marcador para ver el caballo</div>
 
@@ -167,10 +214,10 @@
       <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- CABALLO COMPLETO, CENTRADO, QUIETO -->
-    <a-entity 
+    <!-- CABALLO FIJO, CENTRADO Y COMPLETO -->
+    <a-entity
       id="entidadModelo"
-      scale="0.22 0.22 0.22" 
+      scale="0.22 0.22 0.22"
       position="0 -1.2 -2.8"
       gltf-model="#modelo-actual"
       animation-mixer="clip: *; loop: repeat; timeScale: 1"
@@ -187,9 +234,10 @@
     // === CAMBIAR ANIMACIÓN ===
     btnAnimacion.addEventListener('click', () => {
       const mixer = modeloEntidad.components['animation-mixer'];
-      
+
       if (!mixer || !mixer.model || !mixer.model.animations.length) {
         const velocidad = modeloEntidad.getAttribute('animation-mixer').timeScale || 1;
+
         if (velocidad === 1) {
           modeloEntidad.setAttribute('animation-mixer', 'timeScale', 0.5);
           btnAnimacion.textContent = '🐢 Lenta';
@@ -206,7 +254,7 @@
       const animaciones = mixer.model.animations;
       let indiceAnimacion = 0;
       indiceAnimacion = (indiceAnimacion + 1) % (animaciones.length + 1);
-      
+
       if (indiceAnimacion === 0) {
         modeloEntidad.setAttribute('animation-mixer', 'clip', '*');
         btnAnimacion.textContent = '🔄 Todas';
@@ -271,5 +319,6 @@
       });
     });
   </script>
+
 </body>
 </html>
