@@ -155,7 +155,7 @@
   <video class="fondo-camara" autoplay playsinline muted id="camara"></video>
 
   <a href="/" class="btn-volver">← Volver</a>
-  <div class="mensaje-guia" id="estadoCarga">📷 Cargando modelo...</div>
+  <div class="mensaje-guia" id="estadoCarga">📷 Apunta al marcador</div>
 
   <div class="panel-botones">
     <button class="btn btn-anim" id="btnAnimacion">🔄 Animación</button>
@@ -175,24 +175,24 @@
       <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
+    <!-- POSICIÓN CORREGIDA: más abajo, completo, estable -->
     <a-entity 
       id="entidadModelo"
-      scale="0.35 0.35 0.35" 
-      position="0 -0.3 -2.2"
+      scale="0.3 0.3 0.3" 
+      position="0 -0.8 -2.5"
       gltf-model="#modelo-actual"
       animation-mixer="clip: *; loop: repeat; timeScale: 1"
-      visible="false">
+      visible="true">
     </a-entity>
 
     <a-camera></a-camera>
   </a-scene>
 
   <script>
-    const estadoCarga = document.getElementById('estadoCarga');
     const modeloEntidad = document.getElementById('entidadModelo');
     const btnAnimacion = document.getElementById('btnAnimacion');
+    const estadoCarga = document.getElementById('estadoCarga');
     let indiceAnimacion = 0;
-    let cargado = false;
 
     // === ACTIVAR CÁMARA ===
     navigator.mediaDevices.getUserMedia({ 
@@ -203,31 +203,20 @@
     })
     .catch(err => console.log('Cámara:', err));
 
-    // === DETECTAR CUANDO EL MODELO CARGA ===
+    // === CUANDO CARGA EL MODELO ===
     modeloEntidad.addEventListener('model-loaded', () => {
-      cargado = true;
-      modeloEntidad.setAttribute('visible', 'true');
-      estadoCarga.textContent = '✅ Modelo listo - Apunta al marcador';
-      
-      // Mostrar animaciones disponibles
-      const mixer = modeloEntidad.components['animation-mixer'];
-      if (mixer && mixer.model && mixer.model.animations.length > 0) {
-        estadoCarga.textContent += ` (${mixer.model.animations.length} animaciones)`;
-      }
-      
+      estadoCarga.textContent = '✅ Listo - Apunta al marcador';
       setTimeout(() => {
         estadoCarga.textContent = '📷 Apunta al marcador';
       }, 3000);
     });
 
-    modeloEntidad.addEventListener('model-error', () => {
-      estadoCarga.textContent = '❌ Error al cargar modelo';
-    });
-
-    // === CAMBIAR ANIMACIÓN SIN DEMORA ===
+    // === CAMBIAR ANIMACIÓN ===
     btnAnimacion.addEventListener('click', () => {
-      if (!cargado) {
-        // Si no carga aún, cambiamos velocidad directamente
+      const mixer = modeloEntidad.components['animation-mixer'];
+      
+      if (!mixer || !mixer.model || !mixer.model.animations.length) {
+        // Cambiar velocidad
         const velocidad = modeloEntidad.getAttribute('animation-mixer').timeScale || 1;
         if (velocidad === 1) {
           modeloEntidad.setAttribute('animation-mixer', 'timeScale', 0.5);
@@ -242,26 +231,7 @@
         return;
       }
 
-      const mixer = modeloEntidad.components['animation-mixer'];
-      if (!mixer || !mixer.model) return;
-
-      const animaciones = mixer.model.animations || [];
-      
-      if (animaciones.length === 0) {
-        const velocidad = modeloEntidad.getAttribute('animation-mixer').timeScale;
-        if (velocidad === 1) {
-          modeloEntidad.setAttribute('animation-mixer', 'timeScale', 0.5);
-          btnAnimacion.textContent = '🐢 Lenta';
-        } else if (velocidad === 0.5) {
-          modeloEntidad.setAttribute('animation-mixer', 'timeScale', 1.5);
-          btnAnimacion.textContent = '🐇 Rápida';
-        } else {
-          modeloEntidad.setAttribute('animation-mixer', 'timeScale', 1);
-          btnAnimacion.textContent = '🔄 Normal';
-        }
-        return;
-      }
-
+      const animaciones = mixer.model.animations;
       indiceAnimacion = (indiceAnimacion + 1) % (animaciones.length + 1);
       
       if (indiceAnimacion === 0) {
@@ -322,9 +292,7 @@
       boton.addEventListener('click', function() {
         document.querySelectorAll('.animal-opcion').forEach(op => op.classList.remove('activo'));
         this.classList.add('activo');
-        
         modeloActual.setAttribute('src', this.getAttribute('data-modelo'));
-        cargado = false;
         btnAnimal.textContent = '🐾 ' + this.textContent;
         listaAnimales.classList.remove('mostrar');
       });
