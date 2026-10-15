@@ -11,17 +11,19 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      overflow: hidden;
-      position: fixed;
-      top: 0;
-      left: 0;
-      background: #000;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      overflow: hidden !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      background: #000 !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
-    /* ===== ESTO ES LO QUE ARREGLA LA PANTALLA DIVIDIDA ===== */
+    /* ===== SOLUCIÓN PRINCIPAL: VIDEO A PANTALLA COMPLETA ===== */
     .arjs-video {
       position: absolute !important;
       top: 0 !important;
@@ -34,6 +36,8 @@
       transform-origin: center center !important;
       z-index: 1 !important;
       display: block !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
     a-scene {
@@ -45,12 +49,11 @@
       height: 100dvh !important;
       z-index: 2 !important;
       background: transparent !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
-    .a-enter-vr, .arjs-loader { display: none !important; }
-
-    /* ELIMINAR EL RECUADRO NEGRO DE MARCADOR */
-    .arjs-marker, .arjs-debug { display: none !important; }
+    .a-enter-vr, .arjs-loader, .arjs-debug { display: none !important; }
 
     .btn-volver {
       position: fixed;
@@ -160,7 +163,7 @@
     <button class="animal-opcion activo" data-modelo="/ar/logo.glb">Caballo</button>
   </div>
 
-  <!-- CAMBIO IMPORTANTE: detectionMode mono → llena TODA la pantalla -->
+  <!-- CAMBIO CLAVE: detectionMode = mono → pantalla completa sin recuadro -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
@@ -169,7 +172,7 @@
       <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- CABALLO COMPLETO, CENTRADO, QUIETO -->
+    <!-- CABALLO COMPLETO, CENTRADO -->
     <a-entity
       id="entidadModelo"
       scale="0.22 0.22 0.22"
