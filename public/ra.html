@@ -120,7 +120,6 @@
     .btn:active { transform: scale(0.95); }
     .btn-anim { background: #2563eb; color: white; }
     .btn-grabar { background: #dc2626; color: white; }
-    .btn-animal { background: #f59e0b; color: #1f2937; }
     .btn-girar { background: #7c3aed; color: white; }
     .btn-mover { background: #0891b2; color: white; }
     .btn-grabar.grabando { background: #7f1d1d; animation: parpadeo 1s infinite; }
@@ -128,37 +127,11 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.6; }
     }
-    .lista-animales {
-      position: fixed;
-      bottom: calc(max(120px, env(safe-area-inset-bottom)) + 10px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.85);
-      padding: 15px;
-      border-radius: 12px;
-      z-index: 999;
-      display: none;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      max-width: 92%;
-    }
-    .lista-animales.mostrar { display: flex; }
-    .animal-opcion {
-      background: #006633;
-      color: white;
-      padding: 10px 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .animal-opcion.activo { background: #16a34a; outline: 2px solid white; }
   </style>
 </head>
 <body>
   <a href="/" class="btn-volver">← Volver</a>
-  <div class="mensaje-guia">📷 Apunta al marcador — Caballo fijo, tú lo mueves</div>
+  <div class="mensaje-guia">📷 Apunta al marcador — Leona fija, tú la mueves</div>
 
   <!-- Botones MOVER -->
   <div class="panel-mover">
@@ -181,31 +154,25 @@
   <div class="panel-botones">
     <button class="btn btn-anim" id="btnAnimacion">▶️ Vivir</button>
     <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar</button>
-    <button class="btn btn-animal" id="btnAnimal">🐾 Modelos</button>
   </div>
 
-  <div class="lista-animales" id="listaAnimales">
-    <button class="animal-opcion activo" data-modelo="/ar/logo.glb">🐎 Caballo</button>
-    <button class="animal-opcion" data-modelo="/ar/logos.glb">🦄 Otro</button>
-  </div>
-
-  <!-- ESCENA — CÁMARA IGUAL, solo el caballo fijo -->
+  <!-- ESCENA — SOLO LA LEONA, CÁMARA IGUAL -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
 
     <a-assets timeout="30000">
-      <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
+      <a-asset-item id="leona" src="/ar/leona.glb"></a-asset-item>
     </a-assets>
 
-    <!-- ✅ CABALLO DENTRO DEL MARCADOR → FIJO, no tiembla -->
+    <!-- ✅ LEONA FIJA en el marcador — no tiembla -->
     <a-marker preset="hiro">
       <a-entity
-        id="entidadModelo"
+        id="entidadLeona"
         scale="0.35 0.35 0.35"
         position="0 0 -1.5"
         rotation="0 0 0"
-        gltf-model="#modelo-actual">
+        gltf-model="#leona">
       </a-entity>
     </a-marker>
 
@@ -213,7 +180,7 @@
   </a-scene>
 
   <script>
-    const modeloEntidad = document.getElementById('entidadModelo');
+    const modeloEntidad = document.getElementById('entidadLeona');
     const btnAnimacion = document.getElementById('btnAnimacion');
     
     let posX = 0;
@@ -293,7 +260,7 @@
             const blob = new Blob(trozos, {type: 'video/webm'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'perene-' + Date.now() + '.webm';
+            a.download = 'perene-leona-' + Date.now() + '.webm';
             a.click();
             flujo.getTracks().forEach(t => t.stop());
           };
@@ -310,30 +277,6 @@
         btnGrabar.classList.remove('grabando');
         btnGrabar.textContent = '⏺ Grabar';
       }
-    });
-
-    // CAMBIAR MODELO
-    const btnAnimal = document.getElementById('btnAnimal');
-    const listaAnimales = document.getElementById('listaAnimales');
-    const modeloActual = document.getElementById('modelo-actual');
-    
-    btnAnimal.addEventListener('click', () => listaAnimales.classList.toggle('mostrar'));
-    
-    document.querySelectorAll('.animal-opcion').forEach(boton => {
-      boton.addEventListener('click', function() {
-        document.querySelectorAll('.animal-opcion').forEach(b => b.classList.remove('activo'));
-        this.classList.add('activo');
-        
-        const archivo = this.getAttribute('data-modelo');
-        modeloActual.setAttribute('src', archivo);
-        
-        animacionActiva = false;
-        modeloEntidad.removeAttribute('animation-mixer');
-        btnAnimacion.textContent = '▶️ Vivir';
-        
-        btnAnimal.textContent = '🐾 ' + this.textContent.trim();
-        listaAnimales.classList.remove('mostrar');
-      });
     });
   </script>
 </body>
