@@ -30,8 +30,6 @@
       height: 100vh !important;
       height: 100dvh !important;
       object-fit: cover !important;
-      transform: scale(1.8) !important;
-      transform-origin: center center !important;
       z-index: 1 !important;
       display: block !important;
     }
@@ -131,7 +129,7 @@
 </head>
 <body>
   <a href="/" class="btn-volver">← Volver</a>
-  <div class="mensaje-guia">📷 Apunta al marcador — Leona fija, tú la mueves</div>
+  <div class="mensaje-guia">📷 Enfoca a cualquier lado — La Leona aparece directo ✅</div>
 
   <!-- Botones MOVER -->
   <div class="panel-mover">
@@ -156,7 +154,7 @@
     <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar</button>
   </div>
 
-  <!-- ESCENA — SOLO LA LEONA, CÁMARA IGUAL -->
+  <!-- ✅ SIN MARCADOR — La Leona aparece directo donde apuntas -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
@@ -165,16 +163,14 @@
       <a-asset-item id="leona" src="/ar/leona.glb"></a-asset-item>
     </a-assets>
 
-    <!-- ✅ LEONA FIJA en el marcador — no tiembla -->
-    <a-marker preset="hiro">
-      <a-entity
-        id="entidadLeona"
-        scale="0.35 0.35 0.35"
-        position="0 0 -1.5"
-        rotation="0 0 0"
-        gltf-model="#leona">
-      </a-entity>
-    </a-marker>
+    <!-- ✅ LEONA FIJA DELANTE DE LA CÁMARA — donde enfoques aparece -->
+    <a-entity
+      id="entidadLeona"
+      scale="0.5 0.5 0.5"
+      position="0 0 -3"
+      rotation="0 0 0"
+      gltf-model="#leona">
+    </a-entity>
 
     <a-camera></a-camera>
   </a-scene>
@@ -185,7 +181,7 @@
     
     let posX = 0;
     let posY = 0;
-    let posZ = -1.5;
+    let posZ = -3;
     let rotacionY = 0;
     let animacionActiva = false;
 
