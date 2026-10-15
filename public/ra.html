@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
   <title>Realidad Aumentada - Perené</title>
   
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
@@ -51,7 +49,6 @@
       font-size: 0.9rem;
       border: none;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
     .mensaje-guia {
@@ -67,7 +64,6 @@
       z-index: 999;
       text-align: center;
       max-width: 85%;
-      line-height: 1.3;
     }
 
     .panel-botones {
@@ -91,9 +87,7 @@
       cursor: pointer;
       font-size: 0.8rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: transform 0.1s;
       touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
     }
     .btn:active { transform: scale(0.95); }
 
@@ -131,7 +125,6 @@
       border: none;
       cursor: pointer;
       font-size: 0.85rem;
-      touch-action: manipulation;
     }
     .animal-opcion.activo { 
       background: #16a34a; 
@@ -155,7 +148,7 @@
   <video class="fondo-camara" autoplay playsinline muted id="camara"></video>
 
   <a href="/" class="btn-volver">← Volver</a>
-  <div class="mensaje-guia" id="estadoCarga">📷 Apunta al marcador</div>
+  <div class="mensaje-guia">📷 Apunta al marcador completo</div>
 
   <div class="panel-botones">
     <button class="btn btn-anim" id="btnAnimacion">🔄 Animación</button>
@@ -175,11 +168,11 @@
       <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- POSICIÓN CORREGIDA: más abajo, completo, estable -->
+    <!-- CABALLO: BAJADO, COMPLETO, QUIETO -->
     <a-entity 
       id="entidadModelo"
-      scale="0.3 0.3 0.3" 
-      position="0 -0.8 -2.5"
+      scale="0.22 0.22 0.22" 
+      position="0 -1.2 -2.8"
       gltf-model="#modelo-actual"
       animation-mixer="clip: *; loop: repeat; timeScale: 1"
       visible="true">
@@ -191,8 +184,6 @@
   <script>
     const modeloEntidad = document.getElementById('entidadModelo');
     const btnAnimacion = document.getElementById('btnAnimacion');
-    const estadoCarga = document.getElementById('estadoCarga');
-    let indiceAnimacion = 0;
 
     // === ACTIVAR CÁMARA ===
     navigator.mediaDevices.getUserMedia({ 
@@ -203,20 +194,11 @@
     })
     .catch(err => console.log('Cámara:', err));
 
-    // === CUANDO CARGA EL MODELO ===
-    modeloEntidad.addEventListener('model-loaded', () => {
-      estadoCarga.textContent = '✅ Listo - Apunta al marcador';
-      setTimeout(() => {
-        estadoCarga.textContent = '📷 Apunta al marcador';
-      }, 3000);
-    });
-
     // === CAMBIAR ANIMACIÓN ===
     btnAnimacion.addEventListener('click', () => {
       const mixer = modeloEntidad.components['animation-mixer'];
       
       if (!mixer || !mixer.model || !mixer.model.animations.length) {
-        // Cambiar velocidad
         const velocidad = modeloEntidad.getAttribute('animation-mixer').timeScale || 1;
         if (velocidad === 1) {
           modeloEntidad.setAttribute('animation-mixer', 'timeScale', 0.5);
@@ -232,6 +214,7 @@
       }
 
       const animaciones = mixer.model.animations;
+      let indiceAnimacion = 0;
       indiceAnimacion = (indiceAnimacion + 1) % (animaciones.length + 1);
       
       if (indiceAnimacion === 0) {
