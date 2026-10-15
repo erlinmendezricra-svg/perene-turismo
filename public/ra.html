@@ -2,23 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Realidad Aumentada - Perené</title>
 
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       position: fixed;
       top: 0;
@@ -26,53 +20,34 @@
       background: #000;
     }
 
-    /* ESCENA AR OCUPA TODA LA PANTALLA */
-    a-scene {
-      position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      z-index: 1;
-      background: transparent;
-    }
-
-    /* VIDEO DE CÁMARA A PANTALLA COMPLETA */
+    /* FORZAR VIDEO A PANTALLA COMPLETA */
     .arjs-video {
       position: absolute !important;
       top: 0 !important;
       left: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      height: 100dvh !important;
       object-fit: cover !important;
+      transform: scale(1.1) !important;
       z-index: 1 !important;
-      display: block !important;
-      transform: none !important;
     }
 
-    /* ELIMINAR CARGA Y BOTONES VR */
-    .a-enter-vr,
-    .arjs-loader,
-    .a-canvas {
-      display: none !important;
-    }
-
-    /* CANVAS DE AFRAME ENCIMA DE LA CÁMARA */
-    .a-canvas {
+    a-scene {
       position: absolute !important;
       top: 0 !important;
       left: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      z-index: 2;
+      z-index: 2 !important;
+      background: transparent !important;
     }
+
+    .a-enter-vr, .arjs-loader { display: none !important; }
 
     .btn-volver {
       position: fixed;
-      top: max(10px, env(safe-area-inset-top));
-      left: max(10px, env(safe-area-inset-left));
+      top: 10px;
+      left: 10px;
       background: #006633;
       color: white;
       padding: 10px 16px;
@@ -83,12 +58,11 @@
       font-size: 0.9rem;
       border: none;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
     .mensaje-guia {
       position: fixed;
-      top: max(10px, env(safe-area-inset-top));
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0,0,0,0.75);
@@ -103,7 +77,7 @@
 
     .panel-botones {
       position: fixed;
-      bottom: max(15px, env(safe-area-inset-bottom));
+      bottom: 15px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -122,33 +96,12 @@
       cursor: pointer;
       font-size: 0.8rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      touch-action: manipulation;
-      z-index: 999;
     }
-
-    .btn:active {
-      transform: scale(0.95);
-    }
-
-    .btn-anim {
-      background: #2563eb;
-      color: white;
-    }
-
-    .btn-grabar {
-      background: #dc2626;
-      color: white;
-    }
-
-    .btn-animal {
-      background: #f59e0b;
-      color: #1f2937;
-    }
-
-    .btn-grabar.grabando {
-      background: #7f1d1d;
-      animation: parpadeo 1s infinite;
-    }
+    .btn:active { transform: scale(0.95); }
+    .btn-anim { background: #2563eb; color: white; }
+    .btn-grabar { background: #dc2626; color: white; }
+    .btn-animal { background: #f59e0b; color: #1f2937; }
+    .btn-grabar.grabando { background: #7f1d1d; animation: parpadeo 1s infinite; }
 
     @keyframes parpadeo {
       0%, 100% { opacity: 1; }
@@ -157,7 +110,7 @@
 
     .lista-animales {
       position: fixed;
-      bottom: calc(max(70px, env(safe-area-inset-bottom) + 60px));
+      bottom: 80px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0,0,0,0.85);
@@ -170,11 +123,7 @@
       justify-content: center;
       max-width: 92%;
     }
-
-    .lista-animales.mostrar {
-      display: flex;
-    }
-
+    .lista-animales.mostrar { display: flex; }
     .animal-opcion {
       background: #006633;
       color: white;
@@ -184,15 +133,10 @@
       cursor: pointer;
       font-size: 0.85rem;
     }
-
-    .animal-opcion.activo {
-      background: #16a34a;
-      outline: 2px solid white;
-    }
+    .animal-opcion.activo { background: #16a34a; outline: 2px solid white; }
   </style>
 </head>
 <body>
-
   <a href="/" class="btn-volver">← Volver</a>
   <div class="mensaje-guia">📷 Apunta al marcador para ver el caballo</div>
 
@@ -214,14 +158,13 @@
       <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- CABALLO FIJO, CENTRADO Y COMPLETO -->
+    <!-- CABALLO COMPLETO, CENTRADO, QUIETO -->
     <a-entity
       id="entidadModelo"
       scale="0.22 0.22 0.22"
       position="0 -1.2 -2.8"
       gltf-model="#modelo-actual"
-      animation-mixer="clip: *; loop: repeat; timeScale: 1"
-      visible="true">
+      animation-mixer="clip: *; loop: repeat; timeScale: 1">
     </a-entity>
 
     <a-camera></a-camera>
@@ -231,17 +174,14 @@
     const modeloEntidad = document.getElementById('entidadModelo');
     const btnAnimacion = document.getElementById('btnAnimacion');
 
-    // === CAMBIAR ANIMACIÓN ===
     btnAnimacion.addEventListener('click', () => {
       const mixer = modeloEntidad.components['animation-mixer'];
-
       if (!mixer || !mixer.model || !mixer.model.animations.length) {
-        const velocidad = modeloEntidad.getAttribute('animation-mixer').timeScale || 1;
-
-        if (velocidad === 1) {
+        const vel = modeloEntidad.getAttribute('animation-mixer').timeScale || 1;
+        if (vel === 1) {
           modeloEntidad.setAttribute('animation-mixer', 'timeScale', 0.5);
           btnAnimacion.textContent = '🐢 Lenta';
-        } else if (velocidad === 0.5) {
+        } else if (vel === 0.5) {
           modeloEntidad.setAttribute('animation-mixer', 'timeScale', 1.5);
           btnAnimacion.textContent = '🐇 Rápida';
         } else {
@@ -250,35 +190,29 @@
         }
         return;
       }
-
-      const animaciones = mixer.model.animations;
-      let indiceAnimacion = 0;
-      indiceAnimacion = (indiceAnimacion + 1) % (animaciones.length + 1);
-
-      if (indiceAnimacion === 0) {
+      const anims = mixer.model.animations;
+      let idx = 0;
+      idx = (idx + 1) % (anims.length + 1);
+      if (idx === 0) {
         modeloEntidad.setAttribute('animation-mixer', 'clip', '*');
         btnAnimacion.textContent = '🔄 Todas';
       } else {
-        const anim = animaciones[indiceAnimacion - 1];
-        modeloEntidad.setAttribute('animation-mixer', 'clip', anim.name);
-        btnAnimacion.textContent = '🎬 ' + anim.name.substring(0, 10);
+        modeloEntidad.setAttribute('animation-mixer', 'clip', anims[idx - 1].name);
+        btnAnimacion.textContent = '🎬 ' + anims[idx - 1].name.substring(0, 10);
       }
     });
 
-    // === GRABAR PANTALLA ===
     const btnGrabar = document.getElementById('btnGrabar');
-    let grabando = false;
-    let grabadora = null;
-
+    let grabando = false, grabadora = null;
     btnGrabar.addEventListener('click', async () => {
       if (!grabando) {
         try {
-          const flujo = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+          const flujo = await navigator.mediaDevices.getDisplayMedia({video: true, audio: false});
           grabadora = new MediaRecorder(flujo);
           const trozos = [];
           grabadora.ondataavailable = e => e.data.size && trozos.push(e.data);
           grabadora.onstop = () => {
-            const blob = new Blob(trozos, { type: 'video/webm' });
+            const blob = new Blob(trozos, {type: 'video/webm'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = 'perene-' + Date.now() + '.webm';
@@ -289,9 +223,7 @@
           grabando = true;
           btnGrabar.classList.add('grabando');
           btnGrabar.textContent = '⏹ Detener';
-        } catch (e) {
-          alert('Permite grabar pantalla cuando el navegador lo pide');
-        }
+        } catch { alert('Permite grabar pantalla'); }
       } else {
         grabadora.stop();
         grabando = false;
@@ -300,25 +232,19 @@
       }
     });
 
-    // === ELEGIR OTRO ANIMAL ===
     const btnAnimal = document.getElementById('btnAnimal');
     const listaAnimales = document.getElementById('listaAnimales');
     const modeloActual = document.getElementById('modelo-actual');
-
-    btnAnimal.addEventListener('click', () => {
-      listaAnimales.classList.toggle('mostrar');
-    });
-
-    document.querySelectorAll('.animal-opcion').forEach(boton => {
-      boton.addEventListener('click', function() {
-        document.querySelectorAll('.animal-opcion').forEach(op => op.classList.remove('activo'));
+    btnAnimal.addEventListener('click', () => listaAnimales.classList.toggle('mostrar'));
+    document.querySelectorAll('.animal-opcion').forEach(b => {
+      b.addEventListener('click', function() {
+        document.querySelectorAll('.animal-opcion').forEach(x => x.classList.remove('activo'));
         this.classList.add('activo');
-        modeloActual.setAttribute('src', this.getAttribute('data-modelo'));
+        modeloActual.setAttribute('src', this.dataset.modelo);
         btnAnimal.textContent = '🐾 ' + this.textContent;
         listaAnimales.classList.remove('mostrar');
       });
     });
   </script>
-
 </body>
 </html>
