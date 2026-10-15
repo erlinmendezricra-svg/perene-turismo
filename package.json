@@ -1,20 +1,15 @@
 {
   "name": "perene-turismo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "better-sqlite3": "^13.0.3",
-    "express": "^5.3.0",
-    "mysql2": "^3.24.5",
-    "qrcode": "^1.5.4",
-    "sqlite3": "^6.0.1"
+    "express": "^4.21.0",
+    "sqlite3": "^5.1.7"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
