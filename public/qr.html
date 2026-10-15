@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Códigos QR - Perené</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f5f8f6; padding: 30px 5%; text-align: center; }
+        h1 { color: #0f4d2c; margin-bottom: 8px; }
+        p.sub { color: #555; margin-bottom: 30px; }
+        #qrs { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; max-width: 1100px; margin: auto; }
+        .qr { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 18px rgba(0,0,0,.12); }
+        .qr img { width: 100%; max-width: 200px; }
+        .qr h3 { color: #0f4d2c; margin: 10px 0; font-size: 18px; }
+        .qr a { display: inline-block; background: #198754; color: white; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; }
+        .qr a:hover { background: #146c43; }
+        @media print { .qr a { display: none; } body { background: white; } }
+    </style>
+</head>
+<body>
+
+<h1>Códigos QR de los atractivos</h1>
+<p class="sub">Imprime cada código y colócalo en su atractivo turístico.</p>
+
+<div id="qrs"></div>
+
+<script>
+    fetch('/api/atractivos')
+        .then(r => r.json())
+        .then(lista => {
+            document.getElementById('qrs').innerHTML = lista.map(a => `
+                <div class="qr">
+                    <img src="/api/qr/${a.id}" alt="QR ${a.nombre}">
+                    <h3>${a.nombre}</h3>
+                    <a href="/api/qr/${a.id}" download="qr_${a.nombre}.png">⬇️ Descargar</a>
+                </div>`).join('');
+        });
+</script>
+
+</body>
+</html>

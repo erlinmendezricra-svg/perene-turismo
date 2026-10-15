@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turismo Perené</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { background-color: #f8fef9; color: #333; }
+
+    /* BARRA DE NAVEGACIÓN */
+    .navegacion {
+      background-color: #006633;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navegacion .titulo {
+      color: white;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .navegacion .enlaces a {
+      color: white;
+      text-decoration: none;
+      margin-left: 25px;
+      font-weight: bold;
+    }
+    .navegacion .enlaces a:hover { text-decoration: underline; }
+
+    /* PORTADA COMPLETA SIN RECORTAR */
+    .portada {
+      position: relative;
+      width: 100%;
+      height: auto;
+      min-height: 100vh;
+      background: url('img/PORTADA-PERENE.jpg') no-repeat center center;
+      background-size: 100% auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .portada-texto {
+      color: white;
+      font-size: 2.2rem;
+      font-weight: bold;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+    }
+
+    /* ✅ TU VIDEO EN LUGAR DE LA IMAGEN */
+    .video-fondo {
+      width: 100%;
+      height: 1000px;
+      overflow: hidden;
+    }
+    .video-fondo video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* PASOS QR */
+    .pasos {
+      padding: 50px 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .pasos h2 { color: #0f4d2c; margin-bottom: 15px; font-size: 1.6rem; }
+    .pasos-subtitulo { color: #666; margin-bottom: 35px; }
+    .pasos-contenedor {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .paso {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .paso h3 { color: #0f4d2c; font-size: 1.8rem; margin-bottom: 10px; }
+    .paso h4 { color: #0f4d2c; margin-bottom: 8px; }
+    .paso p { color: #666; font-size: 0.85rem; }
+
+    /* ATRACTIVOS */
+    .atractivos {
+      padding: 20px 20px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .atractivos h2 {
+      text-align: center;
+      color: #0f4d2c;
+      font-size: 2rem;
+      margin-bottom: 35px;
+    }
+    #lista-lugares {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+    }
+    .tarjeta {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .tarjeta img { width: 100%; height: 200px; object-fit: cover; }
+    .tarjeta-contenido { padding: 20px; }
+    .tarjeta h3 { color: #0f4d2c; margin-bottom: 10px; }
+    .tarjeta p { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+    .botones { display: flex; gap: 10px; }
+    .btn-ver {
+      flex: 1;
+      padding: 10px;
+      background: #0f4d2c;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      text-align: center;
+      font-weight: bold;
+    }
+    .btn-qr {
+      padding: 10px 18px;
+      background: #e6f5ed;
+      color: #0f4d2c;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .cargando { text-align: center; color: #666; padding: 40px; }
+    .error { color: red; text-align: center; padding: 30px; }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <nav class="navegacion">
+    <div class="titulo">MUNICIPALIDAD DISTRITAL DE PERENÉ</div>
+    <div class="enlaces">
+      <a href="#">Inicio</a>
+      <a href="#">Atractivos</a>
+      <a href="#">Proyecto</a>
+    </div>
+  </nav>
+
+  <!-- PORTADA COMPLETA -->
+  <header class="portada">
+    <h1 class="portada-texto">Descubre la magia natural de Perené</h1>
+  </header>
+
+  <!-- ✅ TU VIDEO AQUÍ (ya no está la imagen de catarata) -->
+  <section class="video-fondo">
+    <video autoplay muted loop playsinline>
+      <source src="videos/cascada01.mp4" type="video/mp4">
+      Tu navegador no soporta reproducción de video.
+    </video>
+  </section>
+
+  <!-- PASOS DEL QR -->
+  <section class="pasos">
+    <h2>Turismo mediante Códigos QR</h2>
+    <p class="pasos-subtitulo">Escanea el código QR en cada atractivo y accede al instante a toda la información turística.</p>
+    <div class="pasos-contenedor">
+      <div class="paso">
+        <h3>01</h3>
+        <h4>Encuentra el código QR</h4>
+        <p>Ubica el código instalado en el atractivo turístico.</p>
+      </div>
+      <div class="paso">
+        <h3>02</h3>
+        <h4>Escanea con tu celular</h4>
+        <p>Utiliza la cámara de tu celular para escanear el código.</p>
+      </div>
+      <div class="paso">
+        <h3>03</h3>
+        <h4>Conoce y disfruta</h4>
+        <p>Accede a información, imágenes y datos del atractivo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TARJETAS DE ATRACTIVOS -->
+  <section class="atractivos">
+    <h2>Atractivos de Perené</h2>
+    <div id="lista-lugares">
+      <p class="cargando">Cargando atractivos...</p>
+    </div>
+  </section>
+
+  <script>
+    fetch('/api/atractivos')
+      .then(res => res.json())
+      .then(lugares => {
+        const excluir = ['Corona', 'Estatua', 'Parque Perené', 'PARK-PERENÉ'];
+        lugares = lugares.filter(lugar => !excluir.includes(lugar.nombre));
+
+        const contenedor = document.getElementById('lista-lugares');
+        contenedor.innerHTML = '';
+
+        lugares.forEach(lugar => {
+          const tarjeta = document.createElement('div');
+          tarjeta.className = 'tarjeta';
+          const rutaImg = lugar.imagen_principal 
+            ? `/${lugar.imagen_principal}` 
+            : 'img/catarata.jpg';
+          
+          tarjeta.innerHTML = `
+            <img src="${rutaImg}" alt="${lugar.nombre}">
+            <div class="tarjeta-contenido">
+              <h3>${lugar.nombre}</h3>
+              <p>${(lugar.descripcion || '').substring(0, 80)}...</p>
+              <div class="botones">
+                <a href="/lugar/${lugar.id_lugar}" class="btn-ver">Ver detalles</a>
+                <a href="/api/qr/${lugar.id_lugar}" target="_blank" class="btn-qr">QR</a>
+              </div>
+            </div>
+          `;
+          contenedor.appendChild(tarjeta);
+        });
+      })
+      .catch(err => {
+        const contenedor = document.getElementById('lista-lugares');
+        contenedor.innerHTML = `<p class="error">Error cargando datos: ${err.message}</p>`;
+      });
+  </script>
+
+</body>
+</html>
