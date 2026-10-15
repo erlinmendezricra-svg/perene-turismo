@@ -2,112 +2,77 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ESTA LÍNEA ES LA MÁS IMPORTANTE PARA QUE NO SE VEA GIGANTE -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Realidad Aumentada - Perené</title>
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   <style>
-    body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
-    .indicacion {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden; /* NADA DE DESLIZAR, TODO EN PANTALLA */
+      position: fixed; /* FIJA LA PANTALLA PARA QUE NO SE MUEVA */
+    }
+    body {
+      background-color: #000;
+    }
+    /* EL CONTENEDOR DE LA CÁMARA OCUPA EXACTAMENTE LA PANTALLA */
+    #ar-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    video, canvas, .arjs-video, .a-canvas {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important; /* AJUSTA SIN DEFORMAR */
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+    }
+    /* EL MENSAJE DE GUÍA */
+    .mensaje-guia {
       position: absolute;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.75);
       color: white;
-      padding: 12px 25px;
-      border-radius: 30px;
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 0.9rem;
       z-index: 100;
       text-align: center;
-      font-size: 0.95rem;
+      max-width: 90%;
     }
-    .volver {
+    /* BOTÓN VOLVER */
+    .btn-volver {
       position: absolute;
-      top: 20px;
-      left: 20px;
+      top: 15px;
+      left: 15px;
       background: #006633;
       color: white;
-      padding: 10px 20px;
+      padding: 10px 18px;
       border-radius: 6px;
       text-decoration: none;
-      z-index: 100;
       font-weight: bold;
+      z-index: 100;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-
-  <a href="/" class="volver">← Volver</a>
-  <p class="indicacion">📷 Apunta a la imagen del atractivo para ver la información</p>
-
-  <a-scene 
-    embedded 
-    arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
-    vr-mode-ui="enabled: false">
-
-    <a-assets>
-      <!-- Aquí se cargará la imagen del atractivo -->
-    </a-assets>
-
-    <!-- Marcador dinámico según el atractivo -->
-    <a-marker preset="hiro">
-      <a-entity id="contenido-ra">
-        <!-- Aquí aparecerá la info en pantalla -->
-      </a-entity>
-    </a-marker>
-
-    <a-entity camera></a-entity>
-  </a-scene>
-
-  <script>
-    // Cargar datos del atractivo
-    const id = window.location.pathname.split('/').pop();
-    
-    fetch(`/api/lugar/${id}`)
-      .then(res => res.json())
-      .then(lugar => {
-        const contenido = document.getElementById('contenido-ra');
-        
-        contenido.innerHTML = `
-          <!-- Título flotante -->
-          <a-text 
-            value="${lugar.nombre}" 
-            scale="1.5 1.5 1.5" 
-            position="0 1.5 0" 
-            color="#00ff88"
-            align="center"
-            font="monoid"></a-text>
-          
-          <!-- Descripción flotante -->
-          <a-text 
-            value="${(lugar.descripcion || '').substring(0, 60)}..." 
-            scale="0.6 0.6 0.6" 
-            position="0 1.0 0" 
-            color="white"
-            align="center"
-            width="8"></a-text>
-          
-          <!-- Ubicación -->
-          <a-text 
-            value="📍 ${lugar.ubicacion || 'Perené'}" 
-            scale="0.5 0.5 0.5" 
-            position="0 0.5 0" 
-            color="#ffcc00"
-            align="center"
-            width="6"></a-text>
-          
-          <!-- Caja decorativa verde -->
-          <a-box 
-            position="0 1.0 -0.5" 
-            scale="4 2 0.1" 
-            color="#006633" 
-            opacity="0.6"></a-box>
-        `;
-      })
-      .catch(err => {
-        console.error('Error RA:', err);
-      });
-  </script>
-
+  <a href="/" class="btn-volver">← Volver</a>
+  
+  <div class="mensaje-guia">📷 Apunta a la imagen del atractivo para ver la información</div>
+  
+  <div id="ar-container">
+    <!-- Aquí va tu código de Realidad Aumentada -->
+    <!-- ... mantén tu código de AR aquí ... -->
+  </div>
 </body>
 </html>
