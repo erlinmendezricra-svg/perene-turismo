@@ -9,7 +9,7 @@
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   
   <style>
-    * { margin: 0; padding: 0; }
+    * { margin: 0; padding: 0; font-family: Arial, sans-serif; }
     html, body {
       width: 100%;
       height: 100%;
@@ -26,6 +26,8 @@
       object-fit: cover;
       z-index: 1;
     }
+
+    /* BOTÓN VOLVER */
     .btn-volver {
       position: fixed;
       top: 10px;
@@ -38,7 +40,11 @@
       font-weight: bold;
       z-index: 999;
       font-size: 0.85rem;
+      border: none;
+      cursor: pointer;
     }
+
+    /* MENSAJE GUÍA */
     .mensaje-guia {
       position: fixed;
       top: 10px;
@@ -53,6 +59,71 @@
       text-align: center;
       max-width: 85%;
     }
+
+    /* PANEL DE BOTONES */
+    .panel-botones {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 999;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 95%;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.8rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: transform 0.1s;
+    }
+    .btn:active { transform: scale(0.95); }
+
+    .btn-anim { background: #2563eb; color: white; }
+    .btn-grabar { background: #dc2626; color: white; }
+    .btn-animal { background: #f59e0b; color: #1f2937; }
+    .btn-grabar.grabando { background: #7f1d1d; animation: parpadeo 1s infinite; }
+
+    @keyframes parpadeo {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* SELECCIÓN DE ANIMALES */
+    .lista-animales {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      padding: 15px;
+      border-radius: 12px;
+      z-index: 999;
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      max-width: 90%;
+    }
+    .lista-animales.mostrar { display: flex; }
+    .animal-opcion {
+      background: #006633;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .animal-opcion.activo { background: #16a34a; outline: 2px solid white; }
+
     a-scene {
       position: fixed;
       top: 0;
@@ -69,28 +140,44 @@
   <video class="fondo-camara" autoplay playsinline muted id="camara"></video>
 
   <a href="/" class="btn-volver">← Volver</a>
-  
-  <div class="mensaje-guia">📷 Apunta a la imagen del atractivo para ver el modelo</div>
+  <div class="mensaje-guia">📷 Apunta al marcador para ver el modelo</div>
+
+  <!-- PANEL DE BOTONES -->
+  <div class="panel-botones">
+    <button class="btn btn-anim" id="btnAnimacion">🔄 Cambiar Animación</button>
+    <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar Pantalla</button>
+    <button class="btn btn-animal" id="btnAnimal">🐾 Elegir Animal</button>
+  </div>
+
+  <!-- LISTA DE ANIMALES -->
+  <div class="lista-animales" id="listaAnimales">
+    <button class="animal-opcion activo" data-modelo="/ar/logo.glb">Caballo</button>
+    <!-- Agrega más animales aquí cuando los subas -->
+    <!-- Ejemplo: <button class="animal-opcion" data-modelo="/ar/otro.glb">Otro Animal</button> -->
+  </div>
 
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
 
     <a-assets>
-      <a-asset-item id="modelo-animal" src="/ar/logo.glb"></a-asset-item>
+      <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- MODELO: ALEJADO, CENTRADO, TAMAÑO NORMAL Y ESTABLE -->
+    <!-- MODELO: POSICIÓN Y TAMAÑO AJUSTADO -->
     <a-entity 
+      id="entidadModelo"
       scale="0.35 0.35 0.35" 
-      position="0 -0.3 -2.2">
-      <a-gltf-model src="#modelo-animal"></a-gltf-model>
+      position="0 -0.3 -2.2"
+      gltf-model="#modelo-actual"
+      animation-mixer="clip: *; loop: repeat; timeScale: 1">
     </a-entity>
 
     <a-camera></a-camera>
   </a-scene>
 
   <script>
+    // === ACTIVAR CÁMARA ===
     navigator.mediaDevices.getUserMedia({ 
       video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } 
     })
@@ -100,7 +187,134 @@
       video.play();
     })
     .catch(function(err) {
-      console.log('Error:', err);
+      console.log('Error de cámara:', err);
+    });
+
+    // === CAMBIAR ANIMACIÓN ===
+    const btnAnimacion = document.getElementById('btnAnimacion');
+    const modeloEntidad = document.getElementById('entidadModelo');
+    let indiceAnimacion = 0;
+    let nombreAnimacion = 'Todas';
+
+    btnAnimacion.addEventListener('click', function() {
+      // Obtener todas las animaciones del modelo
+      const mixer = modeloEntidad.components['animation-mixer'];
+      if (!mixer) {
+        alert('Modelo aún no cargado, espera un momento');
+        return;
+      }
+
+      // Lista de animaciones disponibles
+      const animaciones = Object.keys(mixer.model?.animations || {});
+      
+      if (animaciones.length === 0) {
+        alert('Cambiando velocidad: Normal → Lenta → Rápida');
+        // Si no hay nombres, cambiamos velocidad
+        const velocidad = modeloEntidad.getAttribute('animation-mixer').timeScale;
+        if (velocidad === 1) {
+          modeloEntidad.setAttribute('animation-mixer', 'timeScale', 0.5);
+          btnAnimacion.textContent = '🐢 Lenta';
+        } else if (velocidad === 0.5) {
+          modeloEntidad.setAttribute('animation-mixer', 'timeScale', 1.5);
+          btnAnimacion.textContent = '🐇 Rápida';
+        } else {
+          modeloEntidad.setAttribute('animation-mixer', 'timeScale', 1);
+          btnAnimacion.textContent = '🔄 Normal';
+        }
+        return;
+      }
+
+      // Cambiar entre animaciones
+      indiceAnimacion = (indiceAnimacion + 1) % (animaciones.length + 1);
+      
+      if (indiceAnimacion === 0) {
+        modeloEntidad.setAttribute('animation-mixer', 'clip', '*');
+        btnAnimacion.textContent = '🔄 Todas';
+      } else {
+        const anim = animaciones[indiceAnimacion - 1];
+        modeloEntidad.setAttribute('animation-mixer', 'clip', anim);
+        btnAnimacion.textContent = '🎬 ' + anim.substring(0, 12);
+      }
+    });
+
+    // === GRABAR PANTALLA ===
+    const btnGrabar = document.getElementById('btnGrabar');
+    let grabando = false;
+    let grabadora = null;
+    let flujoGrabacion = null;
+
+    btnGrabar.addEventListener('click', async function() {
+      if (!grabando) {
+        try {
+          flujoGrabacion = await navigator.mediaDevices.getDisplayMedia({
+            video: { cursor: 'always' },
+            audio: false
+          });
+          
+          grabadora = new MediaRecorder(flujoGrabacion, {
+            mimeType: 'video/webm'
+          });
+          
+          const trozos = [];
+          grabadora.ondataavailable = e => e.data.size && trozos.push(e.data);
+          grabadora.onstop = () => {
+            const blob = new Blob(trozos, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'turismo-perene-' + new Date().toLocaleTimeString().replace(/:/g, '-') + '.webm';
+            a.click();
+            URL.revokeObjectURL(url);
+            flujoGrabacion.getTracks().forEach(t => t.stop());
+          };
+          
+          grabadora.start();
+          grabando = true;
+          btnGrabar.classList.add('grabando');
+          btnGrabar.textContent = '⏹ Detener';
+          
+        } catch (e) {
+          alert('Permite grabar pantalla cuando el navegador lo pide');
+        }
+      } else {
+        grabadora.stop();
+        grabando = false;
+        btnGrabar.classList.remove('grabando');
+        btnGrabar.textContent = '⏺ Grabar Pantalla';
+      }
+    });
+
+    // === ELEGIR OTRO ANIMAL ===
+    const btnAnimal = document.getElementById('btnAnimal');
+    const listaAnimales = document.getElementById('listaAnimales');
+    const modeloActual = document.getElementById('modelo-actual');
+    const opcionesAnimales = document.querySelectorAll('.animal-opcion');
+
+    btnAnimal.addEventListener('click', function() {
+      listaAnimales.classList.toggle('mostrar');
+    });
+
+    opcionesAnimales.forEach(boton => {
+      boton.addEventListener('click', function() {
+        // Quitar activo a todos
+        opcionesAnimales.forEach(op => op.classList.remove('activo'));
+        // Marcar este como activo
+        this.classList.add('activo');
+        
+        // Cambiar el modelo
+        const ruta = this.getAttribute('data-modelo');
+        modeloActual.setAttribute('src', ruta);
+        
+        // Recargar en la escena
+        setTimeout(() => {
+          modeloEntidad.removeAttribute('gltf-model');
+          modeloEntidad.setAttribute('gltf-model', '#modelo-actual');
+        }, 100);
+        
+        // Cerrar lista
+        listaAnimales.classList.remove('mostrar');
+        btnAnimal.textContent = '🐾 ' + this.textContent;
+      });
     });
   </script>
 </body>
