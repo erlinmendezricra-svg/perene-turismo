@@ -6,7 +6,7 @@
   <title>Realidad Aumentada - Perené</title>
   
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -17,13 +17,15 @@
       margin: 0;
       padding: 0;
       background: transparent;
+      position: fixed;
+      top: 0;
+      left: 0;
     }
 
-    /* Botón Volver */
     .btn-volver {
       position: fixed;
-      top: 12px;
-      left: 12px;
+      top: 10px;
+      left: 10px;
       background: #006633;
       color: white;
       padding: 8px 14px;
@@ -34,10 +36,9 @@
       font-size: 0.85rem;
     }
 
-    /* Mensaje de guía */
     .mensaje-guia {
       position: fixed;
-      top: 12px;
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.75);
@@ -47,10 +48,8 @@
       font-size: 0.8rem;
       z-index: 99999;
       text-align: center;
-      max-width: 85%;
     }
 
-    /* Cámara PANTALLA COMPLETA sin bordes ni líneas */
     a-scene {
       position: absolute;
       top: 0;
@@ -58,17 +57,14 @@
       width: 100%;
       height: 100%;
       background: transparent;
-      margin: 0;
-      padding: 0;
-      border: none;
     }
 
     .arjs-video, video {
       position: absolute !important;
       top: 0 !important;
       left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
+      width: 100vw !important;
+      height: 100vh !important;
       object-fit: cover !important;
       display: block !important;
       margin: 0 !important;
@@ -82,12 +78,8 @@
       left: 0 !important;
       width: 100% !important;
       height: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      border: none !important;
     }
 
-    /* Ocultar elementos extra */
     .a-enter-vr, .arjs-loader { display: none !important; }
   </style>
 </head>
@@ -102,24 +94,17 @@
 
     <a-assets></a-assets>
 
-    <a-entity id="ra-contenido">
+    <a-entity>
       <a-text
-        value="¡Atractivo Detectado!"
+        value="¡Detectado!"
         color="#ffffff"
         align="center"
         position="0 0.5 -1"
-        scale="0.5 0.5 0.5"
-        font="https://cdn.aframe.io/fonts/Exo2SemiBold.fnt">
+        scale="0.4 0.4 0.4">
       </a-text>
     </a-entity>
 
     <a-camera position="0 0 0"></a-camera>
   </a-scene>
-
-  <script>
-    navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: 'environment' } 
-    });
-  </script>
 </body>
 </html>
