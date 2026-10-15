@@ -22,7 +22,6 @@
       margin: 0 !important;
       padding: 0 !important;
     }
-
     .arjs-video {
       position: absolute !important;
       top: 0 !important;
@@ -36,7 +35,6 @@
       z-index: 1 !important;
       display: block !important;
     }
-
     a-scene {
       position: absolute !important;
       top: 0 !important;
@@ -47,9 +45,7 @@
       z-index: 2 !important;
       background: transparent !important;
     }
-
     .a-enter-vr, .arjs-loader { display: none !important; }
-
     .btn-volver {
       position: fixed;
       top: max(10px, env(safe-area-inset-top));
@@ -65,7 +61,6 @@
       border: none;
       cursor: pointer;
     }
-
     .mensaje-guia {
       position: fixed;
       top: max(10px, env(safe-area-inset-top));
@@ -80,7 +75,6 @@
       text-align: center;
       max-width: 85%;
     }
-
     .panel-botones {
       position: fixed;
       bottom: max(15px, env(safe-area-inset-bottom));
@@ -93,7 +87,6 @@
       justify-content: center;
       max-width: 98%;
     }
-
     .panel-girar {
       position: fixed;
       bottom: calc(max(80px, env(safe-area-inset-bottom)) + 5px);
@@ -103,10 +96,9 @@
       gap: 6px;
       z-index: 999;
     }
-
     .panel-mover {
       position: fixed;
-      right: 10px;
+      right: 8px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
@@ -114,7 +106,6 @@
       gap: 6px;
       z-index: 999;
     }
-
     .btn {
       padding: 10px 12px;
       border: none;
@@ -133,12 +124,10 @@
     .btn-girar { background: #7c3aed; color: white; }
     .btn-mover { background: #0891b2; color: white; }
     .btn-grabar.grabando { background: #7f1d1d; animation: parpadeo 1s infinite; }
-
     @keyframes parpadeo {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.6; }
     }
-
     .lista-animales {
       position: fixed;
       bottom: calc(max(120px, env(safe-area-inset-bottom)) + 10px);
@@ -169,9 +158,9 @@
 </head>
 <body>
   <a href="/" class="btn-volver">← Volver</a>
-  <div class="mensaje-guia">📷 Apunta al marcador — Caballo quieto, tú lo mueves</div>
+  <div class="mensaje-guia">📷 Apunta al marcador — Caballo fijo, tú lo mueves</div>
 
-  <!-- Botones para MOVER el caballo (lado derecho) -->
+  <!-- Botones MOVER -->
   <div class="panel-mover">
     <button class="btn btn-mover" id="btnArriba">⬆️</button>
     <button class="btn btn-mover" id="btnIzquierda">⬅️</button>
@@ -181,25 +170,26 @@
     <button class="btn btn-mover" id="btnAlejar">🔍-</button>
   </div>
 
-  <!-- Botones para GIRAR el caballo (abajo) -->
+  <!-- Botones GIRAR -->
   <div class="panel-girar">
-    <button class="btn btn-girar" id="btnGirarIzq">↺ Izquierda</button>
+    <button class="btn btn-girar" id="btnGirarIzq">↺ Izq</button>
     <button class="btn btn-girar" id="btnFrente">🔄 Frente</button>
-    <button class="btn btn-girar" id="btnGirarDer">↻ Derecha</button>
+    <button class="btn btn-girar" id="btnGirarDer">↻ Der</button>
   </div>
 
   <!-- Botones principales -->
   <div class="panel-botones">
-    <button class="btn btn-anim" id="btnAnimacion">▶️ Mover</button>
+    <button class="btn btn-anim" id="btnAnimacion">▶️ Vivir</button>
     <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar</button>
     <button class="btn btn-animal" id="btnAnimal">🐾 Modelos</button>
   </div>
 
   <div class="lista-animales" id="listaAnimales">
     <button class="animal-opcion activo" data-modelo="/ar/logo.glb">🐎 Caballo</button>
-    <button class="animal-opcion" data-modelo="/ar/logos.glb">🦄 Segundo Modelo</button>
+    <button class="animal-opcion" data-modelo="/ar/logos.glb">🦄 Otro</button>
   </div>
 
+  <!-- ESCENA — CÁMARA IGUAL, solo el caballo fijo -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
@@ -208,14 +198,16 @@
       <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- CABALLO ESTABLE — SIN ANIMACIÓN AUTOMÁTICA, QUIETO -->
-    <a-entity
-      id="entidadModelo"
-      scale="0.35 0.35 0.35"
-      position="0 -1.0 -2.2"
-      rotation="0 0 0"
-      gltf-model="#modelo-actual">
-    </a-entity>
+    <!-- ✅ CABALLO DENTRO DEL MARCADOR → FIJO, no tiembla -->
+    <a-marker preset="hiro">
+      <a-entity
+        id="entidadModelo"
+        scale="0.35 0.35 0.35"
+        position="0 0 -1.5"
+        rotation="0 0 0"
+        gltf-model="#modelo-actual">
+      </a-entity>
+    </a-marker>
 
     <a-camera></a-camera>
   </a-scene>
@@ -224,14 +216,12 @@
     const modeloEntidad = document.getElementById('entidadModelo');
     const btnAnimacion = document.getElementById('btnAnimacion');
     
-    // VALORES INICIALES
     let posX = 0;
-    let posY = -1.0;
-    let posZ = -2.2;
+    let posY = 0;
+    let posZ = -1.5;
     let rotacionY = 0;
     let animacionActiva = false;
 
-    // ACTUALIZAR POSICIÓN Y ROTACIÓN
     function actualizarPosicion() {
       modeloEntidad.setAttribute('position', `${posX} ${posY} ${posZ}`);
       modeloEntidad.setAttribute('rotation', `0 ${rotacionY} 0`);
@@ -239,11 +229,11 @@
 
     // GIRAR
     document.getElementById('btnGirarIzq').addEventListener('click', () => {
-      rotacionY -= 45;
+      rotacionY -= 30;
       actualizarPosicion();
     });
     document.getElementById('btnGirarDer').addEventListener('click', () => {
-      rotacionY += 45;
+      rotacionY += 30;
       actualizarPosicion();
     });
     document.getElementById('btnFrente').addEventListener('click', () => {
@@ -253,39 +243,39 @@
 
     // MOVER
     document.getElementById('btnArriba').addEventListener('click', () => {
-      posY += 0.2;
+      posY += 0.15;
       actualizarPosicion();
     });
     document.getElementById('btnAbajo').addEventListener('click', () => {
-      posY -= 0.2;
+      posY -= 0.15;
       actualizarPosicion();
     });
     document.getElementById('btnIzquierda').addEventListener('click', () => {
-      posX -= 0.2;
+      posX -= 0.15;
       actualizarPosicion();
     });
     document.getElementById('btnDerecha').addEventListener('click', () => {
-      posX += 0.2;
+      posX += 0.15;
       actualizarPosicion();
     });
     document.getElementById('btnAcercar').addEventListener('click', () => {
-      posZ += 0.2;
+      posZ += 0.15;
       actualizarPosicion();
     });
     document.getElementById('btnAlejar').addEventListener('click', () => {
-      posZ -= 0.2;
+      posZ -= 0.15;
       actualizarPosicion();
     });
 
-    // ANIMACIÓN — SOLO CUANDO TÚ LO ACTIVES
+    // ANIMACIÓN
     btnAnimacion.addEventListener('click', () => {
       animacionActiva = !animacionActiva;
       if (animacionActiva) {
-        modeloEntidad.setAttribute('animation-mixer', 'clip: *; loop: repeat; timeScale: 1');
+        modeloEntidad.setAttribute('animation-mixer', 'clip: *; loop: repeat; timeScale: 0.8');
         btnAnimacion.textContent = '⏸ Quieto';
       } else {
         modeloEntidad.removeAttribute('animation-mixer');
-        btnAnimacion.textContent = '▶️ Mover';
+        btnAnimacion.textContent = '▶️ Vivir';
       }
     });
 
@@ -322,7 +312,7 @@
       }
     });
 
-    // CAMBIAR DE MODELO
+    // CAMBIAR MODELO
     const btnAnimal = document.getElementById('btnAnimal');
     const listaAnimales = document.getElementById('listaAnimales');
     const modeloActual = document.getElementById('modelo-actual');
@@ -337,10 +327,9 @@
         const archivo = this.getAttribute('data-modelo');
         modeloActual.setAttribute('src', archivo);
         
-        // DEJAR QUIETO AL CAMBIAR DE MODELO
         animacionActiva = false;
         modeloEntidad.removeAttribute('animation-mixer');
-        btnAnimacion.textContent = '▶️ Mover';
+        btnAnimacion.textContent = '▶️ Vivir';
         
         btnAnimal.textContent = '🐾 ' + this.textContent.trim();
         listaAnimales.classList.remove('mostrar');
