@@ -64,14 +64,14 @@
       top: max(10px, env(safe-area-inset-top));
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.75);
+      background: rgba(22,163,74,0.9);
       color: white;
-      padding: 10px 16px;
+      padding: 12px 20px;
       border-radius: 20px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
+      font-weight: bold;
       z-index: 999;
       text-align: center;
-      max-width: 85%;
     }
     .panel-botones {
       position: fixed;
@@ -105,12 +105,12 @@
       z-index: 999;
     }
     .btn {
-      padding: 10px 12px;
+      padding: 12px 14px;
       border: none;
       border-radius: 10px;
       font-weight: bold;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       touch-action: manipulation;
       z-index: 999;
@@ -129,7 +129,7 @@
 </head>
 <body>
   <a href="/" class="btn-volver">← Volver</a>
-  <div class="mensaje-guia">📷 Enfoca a cualquier lado — La Leona aparece directo ✅</div>
+  <div class="mensaje-guia">🦁 LA LEONA ESTÁ AQUÍ → Toca 🔍+ si no la ves</div>
 
   <!-- Botones MOVER -->
   <div class="panel-mover">
@@ -154,7 +154,7 @@
     <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar</button>
   </div>
 
-  <!-- ✅ SIN MARCADOR — La Leona aparece directo donde apuntas -->
+  <!-- 🦁 LEONA GRANDE, CERCA, SIN MARCADOR → PARA CELULAR -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
@@ -163,11 +163,10 @@
       <a-asset-item id="leona" src="/ar/leona.glb"></a-asset-item>
     </a-assets>
 
-    <!-- ✅ LEONA FIJA DELANTE DE LA CÁMARA — donde enfoques aparece -->
     <a-entity
       id="entidadLeona"
-      scale="0.5 0.5 0.5"
-      position="0 0 -3"
+      scale="1.0 1.0 1.0"
+      position="0 0 -1.5"
       rotation="0 0 0"
       gltf-model="#leona">
     </a-entity>
@@ -181,7 +180,7 @@
     
     let posX = 0;
     let posY = 0;
-    let posZ = -3;
+    let posZ = -1.5;
     let rotacionY = 0;
     let animacionActiva = false;
 
@@ -190,7 +189,6 @@
       modeloEntidad.setAttribute('rotation', `0 ${rotacionY} 0`);
     }
 
-    // GIRAR
     document.getElementById('btnGirarIzq').addEventListener('click', () => {
       rotacionY -= 30;
       actualizarPosicion();
@@ -204,7 +202,6 @@
       actualizarPosicion();
     });
 
-    // MOVER
     document.getElementById('btnArriba').addEventListener('click', () => {
       posY += 0.15;
       actualizarPosicion();
@@ -230,7 +227,6 @@
       actualizarPosicion();
     });
 
-    // ANIMACIÓN
     btnAnimacion.addEventListener('click', () => {
       animacionActiva = !animacionActiva;
       if (animacionActiva) {
@@ -242,7 +238,6 @@
       }
     });
 
-    // GRABAR
     const btnGrabar = document.getElementById('btnGrabar');
     let grabando = false, grabadora = null;
     btnGrabar.addEventListener('click', async () => {
