@@ -13,14 +13,11 @@
     html, body {
       width: 100vw !important;
       height: 100vh !important;
-      height: 100dvh !important;
       overflow: hidden !important;
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
       background: #000 !important;
-      margin: 0 !important;
-      padding: 0 !important;
     }
     .arjs-video {
       position: absolute !important;
@@ -28,10 +25,8 @@
       left: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      height: 100dvh !important;
       object-fit: cover !important;
-      z-index: 1 !important;
-      display: block !important;
+      z-index: 1;
     }
     a-scene {
       position: absolute !important;
@@ -39,29 +34,25 @@
       left: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      height: 100dvh !important;
-      z-index: 2 !important;
-      background: transparent !important;
+      z-index: 2;
     }
     .a-enter-vr, .arjs-loader { display: none !important; }
     .btn-volver {
       position: fixed;
-      top: max(10px, env(safe-area-inset-top));
-      left: max(10px, env(safe-area-inset-left));
+      top: 10px;
+      left: 10px;
       background: #006633;
       color: white;
       padding: 10px 16px;
       border-radius: 8px;
       text-decoration: none;
       font-weight: bold;
-      z-index: 999;
-      font-size: 0.9rem;
+      z-index: 100;
       border: none;
-      cursor: pointer;
     }
     .mensaje-guia {
       position: fixed;
-      top: max(10px, env(safe-area-inset-top));
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(22,163,74,0.9);
@@ -70,39 +61,36 @@
       border-radius: 20px;
       font-size: 0.9rem;
       font-weight: bold;
-      z-index: 999;
+      z-index: 100;
       text-align: center;
     }
     .panel-botones {
       position: fixed;
-      bottom: max(15px, env(safe-area-inset-bottom));
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 6px;
-      z-index: 999;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 98%;
+      gap: 8px;
+      z-index: 100;
     }
     .panel-girar {
       position: fixed;
-      bottom: calc(max(80px, env(safe-area-inset-bottom)) + 5px);
+      bottom: 80px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 6px;
-      z-index: 999;
+      gap: 8px;
+      z-index: 100;
     }
     .panel-mover {
       position: fixed;
-      right: 8px;
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      z-index: 999;
+      gap: 8px;
+      z-index: 100;
     }
     .btn {
       padding: 12px 14px;
@@ -112,26 +100,19 @@
       cursor: pointer;
       font-size: 0.85rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      touch-action: manipulation;
-      z-index: 999;
+      z-index: 100;
     }
     .btn:active { transform: scale(0.95); }
     .btn-anim { background: #2563eb; color: white; }
     .btn-grabar { background: #dc2626; color: white; }
     .btn-girar { background: #7c3aed; color: white; }
     .btn-mover { background: #0891b2; color: white; }
-    .btn-grabar.grabando { background: #7f1d1d; animation: parpadeo 1s infinite; }
-    @keyframes parpadeo {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
   </style>
 </head>
 <body>
   <a href="/" class="btn-volver">← Volver</a>
   <div class="mensaje-guia">🦁 LA LEONA ESTÁ AQUÍ → Toca 🔍+ si no la ves</div>
 
-  <!-- Botones MOVER -->
   <div class="panel-mover">
     <button class="btn btn-mover" id="btnArriba">⬆️</button>
     <button class="btn btn-mover" id="btnIzquierda">⬅️</button>
@@ -141,20 +122,18 @@
     <button class="btn btn-mover" id="btnAlejar">🔍-</button>
   </div>
 
-  <!-- Botones GIRAR -->
   <div class="panel-girar">
-    <button class="btn btn-girar" id="btnGirarIzq">↺ Izq</button>
-    <button class="btn btn-girar" id="btnFrente">🔄 Frente</button>
-    <button class="btn btn-girar" id="btnGirarDer">↻ Der</button>
+    <button class="btn btn-girar" id="btnGirarIzq">Izg</button>
+    <button class="btn btn-girar" id="btnFrente">Frente</button>
+    <button class="btn btn-girar" id="btnGirarDer">Der</button>
   </div>
 
-  <!-- Botones principales -->
   <div class="panel-botones">
-    <button class="btn btn-anim" id="btnAnimacion">▶️ Vivir</button>
-    <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar</button>
+    <button class="btn btn-anim" id="btnAnimacion">Quieto</button>
+    <button class="btn btn-grabar" id="btnGrabar">Grabar</button>
   </div>
 
-  <!-- 🦁 LEONA GRANDE, CERCA, SIN MARCADOR → PARA CELULAR -->
+  <!-- ✅ SIN MARCADOR — LEONA DIRECTA, VISIBLE Y CERCA -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
@@ -163,15 +142,16 @@
       <a-asset-item id="leona" src="/ar/leona.glb"></a-asset-item>
     </a-assets>
 
+    <!-- 🦁 MUY GRANDE, MUY CERCA → NO SE PIERDE -->
     <a-entity
       id="entidadLeona"
-      scale="1.0 1.0 1.0"
-      position="0 0 -1.5"
+      scale="2 2 2"
+      position="0 1 -2"
       rotation="0 0 0"
       gltf-model="#leona">
     </a-entity>
 
-    <a-camera></a-camera>
+    <a-camera fov="60"></a-camera>
   </a-scene>
 
   <script>
@@ -179,8 +159,8 @@
     const btnAnimacion = document.getElementById('btnAnimacion');
     
     let posX = 0;
-    let posY = 0;
-    let posZ = -1.5;
+    let posY = 1;
+    let posZ = -2;
     let rotacionY = 0;
     let animacionActiva = false;
 
@@ -203,27 +183,27 @@
     });
 
     document.getElementById('btnArriba').addEventListener('click', () => {
-      posY += 0.15;
+      posY += 0.2;
       actualizarPosicion();
     });
     document.getElementById('btnAbajo').addEventListener('click', () => {
-      posY -= 0.15;
+      posY -= 0.2;
       actualizarPosicion();
     });
     document.getElementById('btnIzquierda').addEventListener('click', () => {
-      posX -= 0.15;
+      posX -= 0.2;
       actualizarPosicion();
     });
     document.getElementById('btnDerecha').addEventListener('click', () => {
-      posX += 0.15;
+      posX += 0.2;
       actualizarPosicion();
     });
     document.getElementById('btnAcercar').addEventListener('click', () => {
-      posZ += 0.15;
+      posZ += 0.3;
       actualizarPosicion();
     });
     document.getElementById('btnAlejar').addEventListener('click', () => {
-      posZ -= 0.15;
+      posZ -= 0.3;
       actualizarPosicion();
     });
 
@@ -231,42 +211,10 @@
       animacionActiva = !animacionActiva;
       if (animacionActiva) {
         modeloEntidad.setAttribute('animation-mixer', 'clip: *; loop: repeat; timeScale: 0.8');
-        btnAnimacion.textContent = '⏸ Quieto';
+        btnAnimacion.textContent = 'Vivir';
       } else {
         modeloEntidad.removeAttribute('animation-mixer');
-        btnAnimacion.textContent = '▶️ Vivir';
-      }
-    });
-
-    const btnGrabar = document.getElementById('btnGrabar');
-    let grabando = false, grabadora = null;
-    btnGrabar.addEventListener('click', async () => {
-      if (!grabando) {
-        try {
-          const flujo = await navigator.mediaDevices.getDisplayMedia({video: true, audio: false});
-          grabadora = new MediaRecorder(flujo);
-          const trozos = [];
-          grabadora.ondataavailable = e => e.data.size && trozos.push(e.data);
-          grabadora.onstop = () => {
-            const blob = new Blob(trozos, {type: 'video/webm'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'perene-leona-' + Date.now() + '.webm';
-            a.click();
-            flujo.getTracks().forEach(t => t.stop());
-          };
-          grabadora.start();
-          grabando = true;
-          btnGrabar.classList.add('grabando');
-          btnGrabar.textContent = '⏹ Detener';
-        } catch {
-          alert('Permite grabar pantalla cuando el navegador lo pide');
-        }
-      } else {
-        grabadora.stop();
-        grabando = false;
-        btnGrabar.classList.remove('grabando');
-        btnGrabar.textContent = '⏺ Grabar';
+        btnAnimacion.textContent = 'Quieto';
       }
     });
   </script>
