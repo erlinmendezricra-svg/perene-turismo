@@ -7,19 +7,25 @@
   <meta http-equiv="Permissions-Policy" content="camera=()">
   <title>Realidad Aumentada - Perené</title>
   
-  <!-- Librerías cargadas correctamente -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
   
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { 
+      margin: 0 !important; 
+      padding: 0 !important; 
+      box-sizing: border-box !important; 
+      border: none !important;
+      outline: none !important;
+    }
     html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      background: #000;
+      width: 100% !important;
+      height: 100% !important;
+      overflow: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #000 !important;
+      border: none !important;
     }
 
     /* Botón Volver */
@@ -55,7 +61,7 @@
       line-height: 1.4;
     }
 
-    /* Escena ocupa toda la pantalla */
+    /* Escena SIN bordes ni líneas */
     a-scene {
       position: absolute !important;
       top: 0 !important;
@@ -63,9 +69,13 @@
       width: 100% !important;
       height: 100% !important;
       background-color: transparent !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      outline: none !important;
     }
 
-    /* Video de cámara visible y sin recortes */
+    /* Video de cámara SIN recortes ni líneas */
     .arjs-video, video {
       position: absolute !important;
       top: 0 !important;
@@ -75,6 +85,10 @@
       object-fit: cover !important;
       display: block !important;
       z-index: 1;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      outline: none !important;
     }
 
     canvas {
@@ -84,10 +98,24 @@
       width: 100% !important;
       height: 100% !important;
       z-index: 2;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
     }
 
-    /* Quitar botón de VR */
-    .a-enter-vr { display: none !important; }
+    /* Quitar TODO lo que sobra */
+    .a-enter-vr, .arjs-loader, .arjs-debugui, .a-enter-ar, .ar-shadows {
+      display: none !important;
+      border: none !important;
+    }
+    
+    /* Eliminar cualquier línea blanca */
+    body::before, body::after, 
+    a-scene::before, a-scene::after,
+    video::before, video::after {
+      display: none !important;
+      content: none !important;
+    }
   </style>
 </head>
 <body>
@@ -101,10 +129,8 @@
     renderer="antialias: true; logarithmicDepthBuffer: true;">
 
     <a-assets>
-      <!-- Aquí puedes agregar imágenes o modelos -->
     </a-assets>
 
-    <!-- Tu contenido que aparece al detectar -->
     <a-entity id="ra-contenido">
       <a-text
         value="¡Atractivo Detectado!"
@@ -119,16 +145,16 @@
     <a-camera position="0 0 0"></a-camera>
   </a-scene>
 
-  <!-- Pedir permiso de cámara automáticamente -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment', width: { ideal: 4096 }, height: { ideal: 2160 } } 
+      })
         .then(function(stream) {
           console.log('✅ Cámara activada');
         })
         .catch(function(err) {
           console.log('❌ Error de cámara:', err);
-          alert('Por favor permite el acceso a la cámara cuando el navegador lo pide');
         });
     });
   </script>
