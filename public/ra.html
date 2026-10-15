@@ -23,7 +23,6 @@
       padding: 0 !important;
     }
 
-    /* SOLUCIÓN CLAVE: expandir el video más allá de su tamaño normal */
     .arjs-video {
       position: absolute !important;
       top: 0 !important;
@@ -159,8 +158,6 @@
     <button class="animal-opcion activo" data-modelo="/ar/logo.glb">Caballo</button>
   </div>
 
-  <!-- VOLVEMOS A mono_and_matrix → la cámara funciona correctamente -->
-  <!-- scale(1.8) en CSS expande el video a toda la pantalla -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
@@ -169,13 +166,13 @@
       <a-asset-item id="modelo-actual" src="/ar/logo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- CABALLO COMPLETO Y CENTRADO -->
+    <!-- CABALLO GRANDE, COMPLETO, CENTRADO, CON TODAS SUS ANIMACIONES -->
     <a-entity
       id="entidadModelo"
-      scale="0.22 0.22 0.22"
-      position="0 -1.2 -2.8"
+      scale="0.35 0.35 0.35"
+      position="0 -1.0 -2.2"
       gltf-model="#modelo-actual"
-      animation-mixer="clip: *; loop: repeat; timeScale: 1">
+      animation-mixer="clip: *; loop: repeat; timeScale: 1; autoplay: true">
     </a-entity>
 
     <a-camera></a-camera>
@@ -184,9 +181,22 @@
   <script>
     const modeloEntidad = document.getElementById('entidadModelo');
     const btnAnimacion = document.getElementById('btnAnimacion');
+    let indiceAnimacion = 0;
+    let nombresAnimaciones = [];
+
+    // Detectar animaciones cuando el modelo carga
+    modeloEntidad.addEventListener('model-loaded', () => {
+      const mixer = modeloEntidad.components['animation-mixer'];
+      if (mixer && mixer.model && mixer.model.animations.length > 0) {
+        nombresAnimaciones = mixer.model.animations.map(a => a.name);
+        console.log('Animaciones encontradas:', nombresAnimaciones);
+      }
+    });
 
     btnAnimacion.addEventListener('click', () => {
       const mixer = modeloEntidad.components['animation-mixer'];
+
+      // Si no hay animaciones nombradas, cambiar velocidad
       if (!mixer || !mixer.model || !mixer.model.animations.length) {
         const vel = modeloEntidad.getAttribute('animation-mixer').timeScale || 1;
         if (vel === 1) {
@@ -201,15 +211,18 @@
         }
         return;
       }
+
+      // Si hay animaciones, cambiar entre ellas
       const anims = mixer.model.animations;
-      let idx = 0;
-      idx = (idx + 1) % (anims.length + 1);
-      if (idx === 0) {
+      indiceAnimacion = (indiceAnimacion + 1) % (anims.length + 1);
+
+      if (indiceAnimacion === 0) {
         modeloEntidad.setAttribute('animation-mixer', 'clip', '*');
         btnAnimacion.textContent = '🔄 Todas';
       } else {
-        modeloEntidad.setAttribute('animation-mixer', 'clip', anims[idx - 1].name);
-        btnAnimacion.textContent = '🎬 ' + anims[idx - 1].name.substring(0, 10);
+        const anim = anims[indiceAnimacion - 1];
+        modeloEntidad.setAttribute('animation-mixer', 'clip', anim.name);
+        btnAnimacion.textContent = '🎬 ' + anim.name.substring(0, 10);
       }
     });
 
