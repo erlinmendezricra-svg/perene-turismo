@@ -61,7 +61,7 @@
       cursor: pointer;
     }
 
-    /* SELECTOR DE ANIMALES — MENÚ DESPLEGABLE */
+    /* MENÚ DESPLEGABLE */
     .selector-animal {
       position: fixed;
       top: max(10px, env(safe-area-inset-top));
@@ -110,7 +110,6 @@
       background: rgba(255,255,255,0.2);
     }
 
-    /* PANELES DE CONTROL */
     .panel-mover {
       position: fixed;
       right: 8px;
@@ -161,7 +160,7 @@
 <body>
   <a href="/" class="btn-volver">← Volver</a>
 
-  <!-- ✅ MENÚ DESPLEGABLE PARA ELEGIR ANIMAL -->
+  <!-- MENÚ DE ANIMALES -->
   <div class="selector-animal">
     <button class="btn-elegir" id="btnElegir">🦁 Leona ▾</button>
     <div class="lista-animales" id="listaAnimales">
@@ -173,7 +172,7 @@
     </div>
   </div>
 
-  <!-- Botones MOVER derecha -->
+  <!-- BOTONES DE CONTROL -->
   <div class="panel-mover">
     <button class="btn btn-mover" id="btnArriba">⬆️</button>
     <button class="btn btn-mover" id="btnIzquierda">⬅️</button>
@@ -183,25 +182,25 @@
     <button class="btn btn-mover" id="btnAlejar">🔍-</button>
   </div>
 
-  <!-- Botones GIRAR abajo centro -->
   <div class="panel-girar">
     <button class="btn btn-girar" id="btnGirarIzq">↺ Izq</button>
     <button class="btn btn-girar" id="btnFrente">🔄 Frente</button>
     <button class="btn btn-girar" id="btnGirarDer">↻ Der</button>
   </div>
 
-  <!-- Botones ACCIONES abajo -->
   <div class="panel-acciones">
     <button class="btn btn-anim" id="btnAnimacion">▶️ Vivir</button>
     <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar</button>
   </div>
 
-  <!-- ✅ ESCENA: TODOS LOS ANIMALES — TAMAÑO Y LUGAR IGUALES -->
+  <!-- ESCENA SIN TEMBLOR — POSICIÓN FIJA -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
-    vr-mode-ui="enabled: false">
+    vr-mode-ui="enabled: false"
+    renderer="antialias: true; logarithmicDepthBuffer: true;">
 
-    <a-assets timeout="30000">
+    <a-assets timeout="60000">
+      <!-- ✅ TODOS LOS ARCHIVOS CON NOMBRES EXACTOS -->
       <a-asset-item id="leona" src="/ar/leona.glb"></a-asset-item>
       <a-asset-item id="saurio" src="/ar/saurio.glb"></a-asset-item>
       <a-asset-item id="lobo" src="/ar/lobo.glb"></a-asset-item>
@@ -209,17 +208,60 @@
       <a-asset-item id="conejo" src="/ar/conejo.glb"></a-asset-item>
     </a-assets>
 
-    <a-entity id="entidadLeona" scale="0.8 0.8 0.8" position="0 0 -2.0" rotation="0 0 0" gltf-model="#leona"></a-entity>
-    <a-entity id="entidadSaurio" scale="0.8 0.8 0.8" position="0 0 -2.0" rotation="0 0 0" gltf-model="#saurio" visible="false"></a-entity>
-    <a-entity id="entidadLobo" scale="0.8 0.8 0.8" position="0 0 -2.0" rotation="0 0 0" gltf-model="#lobo" visible="false"></a-entity>
-    <a-entity id="entidadCocodrilo" scale="0.8 0.8 0.8" position="0 0 -2.0" rotation="0 0 0" gltf-model="#cocodrilo" visible="false"></a-entity>
-    <a-entity id="entidadConejo" scale="0.8 0.8 0.8" position="0 0 -2.0" rotation="0 0 0" gltf-model="#conejo" visible="false"></a-entity>
+    <!-- 🦁 Leona — FIJA, SIN TEMBLOR -->
+    <a-entity id="entidadLeona"
+      scale="0.8 0.8 0.8"
+      position="0 0 -2.0"
+      rotation="0 0 0"
+      gltf-model="#leona"
+      animation-mixer="loop: repeat; timeScale: 1.0"
+      data-animate="true">
+    </a-entity>
 
-    <a-camera></a-camera>
+    <!-- 🦖 Saurio -->
+    <a-entity id="entidadSaurio"
+      scale="0.8 0.8 0.8"
+      position="0 0 -2.0"
+      rotation="0 0 0"
+      gltf-model="#saurio"
+      visible="false"
+      data-animate="true">
+    </a-entity>
+
+    <!-- 🐺 Lobo -->
+    <a-entity id="entidadLobo"
+      scale="0.8 0.8 0.8"
+      position="0 0 -2.0"
+      rotation="0 0 0"
+      gltf-model="#lobo"
+      visible="false"
+      data-animate="true">
+    </a-entity>
+
+    <!-- 🐊 Cocodrilo -->
+    <a-entity id="entidadCocodrilo"
+      scale="0.8 0.8 0.8"
+      position="0 0 -2.0"
+      rotation="0 0 0"
+      gltf-model="#cocodrilo"
+      visible="false"
+      data-animate="true">
+    </a-entity>
+
+    <!-- 🐰 Conejo -->
+    <a-entity id="entidadConejo"
+      scale="0.8 0.8 0.8"
+      position="0 0 -2.0"
+      rotation="0 0 0"
+      gltf-model="#conejo"
+      visible="false"
+      data-animate="true">
+    </a-entity>
+
+    <a-camera far="100" near="0.1" fov="60"></a-camera>
   </a-scene>
 
   <script>
-    // Entidades
     const entidades = {
       leona: document.getElementById('entidadLeona'),
       saurio: document.getElementById('entidadSaurio'),
@@ -228,7 +270,6 @@
       conejo: document.getElementById('entidadConejo')
     };
 
-    // Elementos del menú
     const btnElegir = document.getElementById('btnElegir');
     const listaAnimales = document.getElementById('listaAnimales');
     const opciones = document.querySelectorAll('.opcion-animal');
@@ -237,31 +278,20 @@
     let modeloActivo = 'leona';
     let posX = 0, posY = 0, posZ = -2.0;
     let rotacionY = 0;
-    let animacionActiva = false;
+    let animacionActiva = true; // Empieza activa
 
-    // Abrir/cerrar menú
+    // Menú
     btnElegir.addEventListener('click', (e) => {
       e.stopPropagation();
       listaAnimales.classList.toggle('mostrar');
     });
+    document.addEventListener('click', () => listaAnimales.classList.remove('mostrar'));
+    listaAnimales.addEventListener('click', e => e.stopPropagation());
 
-    // Cerrar menú al tocar fuera
-    document.addEventListener('click', () => {
-      listaAnimales.classList.remove('mostrar');
-    });
-    listaAnimales.addEventListener('click', (e) => e.stopPropagation());
-
-    // Cambiar de animal
+    // CAMBIAR DE ANIMAL — SIN TEMBLOR, MISMO LUGAR
     opciones.forEach(opcion => {
       opcion.addEventListener('click', () => {
         const animal = opcion.dataset.animal;
-        
-        // Detener animación anterior
-        if (animacionActiva) {
-          entidades[modeloActivo].removeAttribute('animation-mixer');
-          animacionActiva = false;
-          btnAnimacion.textContent = '▶️ Vivir';
-        }
 
         // Ocultar todos
         Object.keys(entidades).forEach(clave => {
@@ -269,15 +299,17 @@
         });
         opciones.forEach(opt => opt.classList.remove('activo'));
 
-        // Mostrar seleccionado
+        // Mostrar el elegido
         entidades[animal].setAttribute('visible', 'true');
         opcion.classList.add('activo');
         modeloActivo = animal;
         btnElegir.textContent = opcion.textContent + ' ▾';
         listaAnimales.classList.remove('mostrar');
-        
-        // Mantener posición y tamaño
-        actualizarPosicion();
+
+        // Restaurar animación
+        if (animacionActiva) {
+          entidades[modeloActivo].setAttribute('animation-mixer', 'loop: repeat; timeScale: 1.0');
+        }
       });
     });
 
@@ -317,15 +349,14 @@
       posZ -= 0.15; actualizarPosicion();
     });
 
-    // ✅ ANIMACIÓN — cada animal usa la suya
+    // ANIMACIÓN — PRENDER/APAGAR
     btnAnimacion.addEventListener('click', () => {
       animacionActiva = !animacionActiva;
-      const entidad = entidades[modeloActivo];
       if (animacionActiva) {
-        entidad.setAttribute('animation-mixer', 'clip: *; loop: repeat; timeScale: 1.0');
+        entidades[modeloActivo].setAttribute('animation-mixer', 'loop: repeat; timeScale: 1.0');
         btnAnimacion.textContent = '⏸ Quieto';
       } else {
-        entidad.removeAttribute('animation-mixer');
+        entidades[modeloActivo].removeAttribute('animation-mixer');
         btnAnimacion.textContent = '▶️ Vivir';
       }
     });
