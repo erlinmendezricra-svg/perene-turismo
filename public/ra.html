@@ -61,27 +61,33 @@
       cursor: pointer;
     }
 
-    /* Botones de animales ARRIBA, bien visibles */
+    /* Botones de animales ARRIBA */
     .panel-animales {
       position: fixed;
       top: max(10px, env(safe-area-inset-top));
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 10px;
+      gap: 6px;
       z-index: 999;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 95%;
     }
     .btn-animal {
-      padding: 12px 20px;
+      padding: 10px 14px;
       border: none;
       border-radius: 10px;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 0.9rem;
       cursor: pointer;
       box-shadow: 0 3px 8px rgba(0,0,0,0.4);
     }
     .btn-leona { background: #eab308; color: #1f1f1f; }
     .btn-saurio { background: #f97316; color: white; }
+    .btn-lobo   { background: #6366f1; color: white; }
+    .btn-coco   { background: #10b981; color: white; }
+    .btn-conejo { background: #ec4899; color: white; }
     .btn-animal.activo {
       outline: 3px solid white;
       transform: scale(1.05);
@@ -151,10 +157,13 @@
 <body>
   <a href="/" class="btn-volver">← Volver</a>
 
-  <!-- ✅ BOTONES PARA CAMBIAR ENTRE LEONA Y SAURIO -->
+  <!-- ✅ TODOS LOS ANIMALES EN BOTONES -->
   <div class="panel-animales">
     <button class="btn-animal btn-leona activo" id="btnLeona">🦁 Leona</button>
     <button class="btn-animal btn-saurio" id="btnSaurio">🦖 Saurio</button>
+    <button class="btn-animal btn-lobo" id="btnLobo">🐺 Lobo</button>
+    <button class="btn-animal btn-coco" id="btnCoco">🐊 Coco</button>
+    <button class="btn-animal btn-conejo" id="btnConejo">🐰 Conejo</button>
   </div>
 
   <div class="mensaje-guia">📷 Cámara activa — toca el animal que quieras ver</div>
@@ -182,7 +191,7 @@
     <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar</button>
   </div>
 
-  <!-- ✅ ESCENA: cámara + leona + saurio -->
+  <!-- ✅ ESCENA CON TODOS LOS ANIMALES -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
@@ -190,35 +199,44 @@
     <a-assets timeout="30000">
       <a-asset-item id="leona" src="/ar/leona.glb"></a-asset-item>
       <a-asset-item id="saurio" src="/ar/saurio.glb"></a-asset-item>
+      <a-asset-item id="lobo" src="/ar/lobo.glb"></a-asset-item>
+      <a-asset-item id="coco" src="/ar/cocodrilo.glb"></a-asset-item>
+      <a-asset-item id="conejo" src="/ar/conejo.glb"></a-asset-item>
     </a-assets>
 
     <!-- 🦁 LEONA -->
-    <a-entity
-      id="entidadLeona"
-      scale="1 1 1"
-      position="0 0 -1.5"
-      rotation="0 0 0"
-      gltf-model="#leona">
-    </a-entity>
+    <a-entity id="entidadLeona" scale="1 1 1" position="0 0 -1.5" rotation="0 0 0" gltf-model="#leona"></a-entity>
 
     <!-- 🦖 SAURIO -->
-    <a-entity
-      id="entidadSaurio"
-      scale="1 1 1"
-      position="0 0 -1.5"
-      rotation="0 0 0"
-      gltf-model="#saurio"
-      visible="false">
-    </a-entity>
+    <a-entity id="entidadSaurio" scale="1 1 1" position="0 0 -1.5" rotation="0 0 0" gltf-model="#saurio" visible="false"></a-entity>
+
+    <!-- 🐺 LOBO -->
+    <a-entity id="entidadLobo" scale="1 1 1" position="0 0 -1.5" rotation="0 0 0" gltf-model="#lobo" visible="false"></a-entity>
+
+    <!-- 🐊 COCODRILO -->
+    <a-entity id="entidadCoco" scale="1 1 1" position="0 0 -1.5" rotation="0 0 0" gltf-model="#coco" visible="false"></a-entity>
+
+    <!-- 🐰 CONEJO -->
+    <a-entity id="entidadConejo" scale="1 1 1" position="0 0 -1.5" rotation="0 0 0" gltf-model="#conejo" visible="false"></a-entity>
 
     <a-camera></a-camera>
   </a-scene>
 
   <script>
+    // Todas las entidades
     const entidadLeona = document.getElementById('entidadLeona');
     const entidadSaurio = document.getElementById('entidadSaurio');
+    const entidadLobo = document.getElementById('entidadLobo');
+    const entidadCoco = document.getElementById('entidadCoco');
+    const entidadConejo = document.getElementById('entidadConejo');
+
+    // Botones de animales
     const btnLeona = document.getElementById('btnLeona');
     const btnSaurio = document.getElementById('btnSaurio');
+    const btnLobo = document.getElementById('btnLobo');
+    const btnCoco = document.getElementById('btnCoco');
+    const btnConejo = document.getElementById('btnConejo');
+
     const btnAnimacion = document.getElementById('btnAnimacion');
     
     let modeloActivo = 'leona';
@@ -227,7 +245,29 @@
     let animacionActiva = false;
 
     function getModeloActivo() {
-      return modeloActivo === 'leona' ? entidadLeona : entidadSaurio;
+      switch(modeloActivo) {
+        case 'leona': return entidadLeona;
+        case 'saurio': return entidadSaurio;
+        case 'lobo': return entidadLobo;
+        case 'coco': return entidadCoco;
+        case 'conejo': return entidadConejo;
+      }
+    }
+
+    function ocultarTodos() {
+      entidadLeona.setAttribute('visible', 'false');
+      entidadSaurio.setAttribute('visible', 'false');
+      entidadLobo.setAttribute('visible', 'false');
+      entidadCoco.setAttribute('visible', 'false');
+      entidadConejo.setAttribute('visible', 'false');
+      btnLeona.classList.remove('activo');
+      btnSaurio.classList.remove('activo');
+      btnLobo.classList.remove('activo');
+      btnCoco.classList.remove('activo');
+      btnConejo.classList.remove('activo');
+      posX = 0; posY = 0; posZ = -1.5; rotacionY = 0;
+      animacionActiva = false;
+      btnAnimacion.textContent = '▶️ Vivir';
     }
 
     function actualizarPosicion() {
@@ -236,30 +276,45 @@
       m.setAttribute('rotation', `0 ${rotacionY} 0`);
     }
 
-    // CAMBIAR A LEONA
+    // CAMBIAR A CADA ANIMAL
     btnLeona.addEventListener('click', () => {
+      ocultarTodos();
       entidadLeona.setAttribute('visible', 'true');
-      entidadSaurio.setAttribute('visible', 'false');
-      modeloActivo = 'leona';
       btnLeona.classList.add('activo');
-      btnSaurio.classList.remove('activo');
-      posX = 0; posY = 0; posZ = -1.5; rotacionY = 0;
+      modeloActivo = 'leona';
       actualizarPosicion();
-      animacionActiva = false;
-      btnAnimacion.textContent = '▶️ Vivir';
     });
 
-    // CAMBIAR A SAURIO
     btnSaurio.addEventListener('click', () => {
-      entidadLeona.setAttribute('visible', 'false');
+      ocultarTodos();
       entidadSaurio.setAttribute('visible', 'true');
-      modeloActivo = 'saurio';
       btnSaurio.classList.add('activo');
-      btnLeona.classList.remove('activo');
-      posX = 0; posY = 0; posZ = -1.5; rotacionY = 0;
+      modeloActivo = 'saurio';
       actualizarPosicion();
-      animacionActiva = false;
-      btnAnimacion.textContent = '▶️ Vivir';
+    });
+
+    btnLobo.addEventListener('click', () => {
+      ocultarTodos();
+      entidadLobo.setAttribute('visible', 'true');
+      btnLobo.classList.add('activo');
+      modeloActivo = 'lobo';
+      actualizarPosicion();
+    });
+
+    btnCoco.addEventListener('click', () => {
+      ocultarTodos();
+      entidadCoco.setAttribute('visible', 'true');
+      btnCoco.classList.add('activo');
+      modeloActivo = 'coco';
+      actualizarPosicion();
+    });
+
+    btnConejo.addEventListener('click', () => {
+      ocultarTodos();
+      entidadConejo.setAttribute('visible', 'true');
+      btnConejo.classList.add('activo');
+      modeloActivo = 'conejo';
+      actualizarPosicion();
     });
 
     // GIRAR
