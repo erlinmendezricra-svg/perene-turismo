@@ -157,7 +157,7 @@
 <body>
   <a href="/" class="btn-volver">← Volver</a>
 
-  <!-- ✅ TODOS LOS ANIMALES EN BOTONES -->
+  <!-- ✅ BOTONES DE ANIMALES -->
   <div class="panel-animales">
     <button class="btn-animal btn-leona activo" id="btnLeona">🦁 Leona</button>
     <button class="btn-animal btn-saurio" id="btnSaurio">🦖 Saurio</button>
@@ -166,7 +166,7 @@
     <button class="btn-animal btn-conejo" id="btnConejo">🐰 Conejo</button>
   </div>
 
-  <div class="mensaje-guia">📷 Cámara activa — toca el animal que quieras ver</div>
+  <div class="mensaje-guia">📷 Toca ▶️ Vivir para ver los movimientos de cada animal</div>
 
   <!-- Botones MOVER derecha -->
   <div class="panel-mover">
@@ -191,7 +191,7 @@
     <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar</button>
   </div>
 
-  <!-- ✅ ESCENA CON TODOS LOS ANIMALES -->
+  <!-- ✅ ESCENA: TODOS MISMO TAMAÑO Y POSICIÓN CENTRAL -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
@@ -204,20 +204,49 @@
       <a-asset-item id="conejo" src="/ar/conejo.glb"></a-asset-item>
     </a-assets>
 
-    <!-- 🦁 LEONA -->
-    <a-entity id="entidadLeona" scale="1 1 1" position="0 0 -1.5" rotation="0 0 0" gltf-model="#leona"></a-entity>
+    <!-- 🦁 Leona - TAMAÑO Y POSICIÓN FIJAS -->
+    <a-entity id="entidadLeona"
+      scale="0.8 0.8 0.8"
+      position="0 0 -2.0"
+      rotation="0 0 0"
+      gltf-model="#leona">
+    </a-entity>
 
-    <!-- 🦖 SAURIO -->
-    <a-entity id="entidadSaurio" scale="1 1 1" position="0 0 -1.5" rotation="0 0 0" gltf-model="#saurio" visible="false"></a-entity>
+    <!-- 🦖 Saurio - MISMO TAMAÑO Y LUGAR -->
+    <a-entity id="entidadSaurio"
+      scale="0.8 0.8 0.8"
+      position="0 0 -2.0"
+      rotation="0 0 0"
+      gltf-model="#saurio"
+      visible="false">
+    </a-entity>
 
-    <!-- 🐺 LOBO -->
-    <a-entity id="entidadLobo" scale="1 1 1" position="0 0 -1.5" rotation="0 0 0" gltf-model="#lobo" visible="false"></a-entity>
+    <!-- 🐺 Lobo - IGUAL QUE TODOS -->
+    <a-entity id="entidadLobo"
+      scale="0.8 0.8 0.8"
+      position="0 0 -2.0"
+      rotation="0 0 0"
+      gltf-model="#lobo"
+      visible="false">
+    </a-entity>
 
-    <!-- 🐊 COCODRILO -->
-    <a-entity id="entidadCoco" scale="1 1 1" position="0 0 -1.5" rotation="0 0 0" gltf-model="#coco" visible="false"></a-entity>
+    <!-- 🐊 Cocodrilo - IGUAL QUE TODOS -->
+    <a-entity id="entidadCoco"
+      scale="0.8 0.8 0.8"
+      position="0 0 -2.0"
+      rotation="0 0 0"
+      gltf-model="#coco"
+      visible="false">
+    </a-entity>
 
-    <!-- 🐰 CONEJO -->
-    <a-entity id="entidadConejo" scale="1 1 1" position="0 0 -1.5" rotation="0 0 0" gltf-model="#conejo" visible="false"></a-entity>
+    <!-- 🐰 Conejo - IGUAL QUE TODOS -->
+    <a-entity id="entidadConejo"
+      scale="0.8 0.8 0.8"
+      position="0 0 -2.0"
+      rotation="0 0 0"
+      gltf-model="#conejo"
+      visible="false">
+    </a-entity>
 
     <a-camera></a-camera>
   </a-scene>
@@ -240,7 +269,8 @@
     const btnAnimacion = document.getElementById('btnAnimacion');
     
     let modeloActivo = 'leona';
-    let posX = 0, posY = 0, posZ = -1.5;
+    // Posición CENTRAL FIJA - NO SE MUEVE AL CAMBIAR
+    let posX = 0, posY = 0, posZ = -2.0;
     let rotacionY = 0;
     let animacionActiva = false;
 
@@ -255,6 +285,13 @@
     }
 
     function ocultarTodos() {
+      // Detener animación antes de cambiar
+      if (animacionActiva) {
+        getModeloActivo().removeAttribute('animation-mixer');
+        animacionActiva = false;
+        btnAnimacion.textContent = '▶️ Vivir';
+      }
+      // Ocultar todo
       entidadLeona.setAttribute('visible', 'false');
       entidadSaurio.setAttribute('visible', 'false');
       entidadLobo.setAttribute('visible', 'false');
@@ -265,9 +302,7 @@
       btnLobo.classList.remove('activo');
       btnCoco.classList.remove('activo');
       btnConejo.classList.remove('activo');
-      posX = 0; posY = 0; posZ = -1.5; rotacionY = 0;
-      animacionActiva = false;
-      btnAnimacion.textContent = '▶️ Vivir';
+      // NO se reinicia posición → se queda en el centro fijo
     }
 
     function actualizarPosicion() {
@@ -276,7 +311,7 @@
       m.setAttribute('rotation', `0 ${rotacionY} 0`);
     }
 
-    // CAMBIAR A CADA ANIMAL
+    // CAMBIAR A CADA ANIMAL → MISMO LUGAR Y TAMAÑO
     btnLeona.addEventListener('click', () => {
       ocultarTodos();
       entidadLeona.setAttribute('visible', 'true');
@@ -348,12 +383,13 @@
       posZ -= 0.15; actualizarPosicion();
     });
 
-    // ANIMACIÓN
+    // ✅ ANIMACIÓN DE CADA ANIMAL POR SEPARADO
     btnAnimacion.addEventListener('click', () => {
       animacionActiva = !animacionActiva;
       const m = getModeloActivo();
       if (animacionActiva) {
-        m.setAttribute('animation-mixer', 'clip: *; loop: repeat; timeScale: 0.8');
+        // Cada animal usa SUS propias animaciones
+        m.setAttribute('animation-mixer', 'clip: *; loop: repeat; timeScale: 1.0');
         btnAnimacion.textContent = '⏸ Quieto';
       } else {
         m.removeAttribute('animation-mixer');
