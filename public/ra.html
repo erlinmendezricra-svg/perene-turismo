@@ -120,16 +120,14 @@
     .btn-grabar { background: #dc2626; color: white; }
     .btn-girar { background: #7c3aed; color: white; }
     .btn-mover { background: #0891b2; color: white; }
-    .btn-grabar.grabando { background: #7f1d1d; animation: parpadeo 1s infinite; }
-    @keyframes parpadeo {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
+    .btn-leona { background: #eab308; color: white; }
+    .btn-saurio { background: #f97316; color: white; }
+    .activo { outline: 3px solid white; }
   </style>
 </head>
 <body>
   <a href="/" class="btn-volver">← Volver</a>
-  <div class="mensaje-guia">🦁 LA LEONDA ESTÁ AQUÍ → Toca 🔍+ si no la ves</div>
+  <div class="mensaje-guia">🦁🦖 Elige el modelo — cámara igual ✅</div>
 
   <!-- Botones MOVER -->
   <div class="panel-mover">
@@ -148,22 +146,25 @@
     <button class="btn btn-girar" id="btnGirarDer">↻ Der</button>
   </div>
 
-  <!-- Botones principales -->
+  <!-- Botones de modelo + acciones -->
   <div class="panel-botones">
+    <button class="btn btn-leona activo" id="btnLeona">🦁 Leona</button>
+    <button class="btn btn-saurio" id="btnSaurio">🦖 Saurio</button>
     <button class="btn btn-anim" id="btnAnimacion">▶️ Vivir</button>
     <button class="btn btn-grabar" id="btnGrabar">⏺ Grabar</button>
   </div>
 
-  <!-- ✅ ESCENA ORIGINAL: no modifiqué nada de la cámara -->
+  <!-- ✅ ESCENA — CÁMARA INTACTA, IGUAL QUE TENÍAS -->
   <a-scene
     arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
     vr-mode-ui="enabled: false">
 
     <a-assets timeout="30000">
       <a-asset-item id="leona" src="/ar/leona.glb"></a-asset-item>
+      <a-asset-item id="saurio" src="/ar/saurio.glb"></a-asset-item>
     </a-assets>
 
-    <!-- 🦁 LEONDA CON TAMAÑO NORMAL, CERCA Y VISIBLE -->
+    <!-- 🦁 LEONA — tamaño controlado -->
     <a-entity
       id="entidadLeona"
       scale="0.6 0.6 0.6"
@@ -172,72 +173,104 @@
       gltf-model="#leona">
     </a-entity>
 
+    <!-- 🦖 SAURIO — mismo tamaño y posición -->
+    <a-entity
+      id="entidadSaurio"
+      scale="0.6 0.6 0.6"
+      position="0 0 -1.5"
+      rotation="0 0 0"
+      gltf-model="#saurio"
+      visible="false">
+    </a-entity>
+
     <a-camera></a-camera>
   </a-scene>
 
   <script>
-    const modeloEntidad = document.getElementById('entidadLeona');
+    const entidadLeona = document.getElementById('entidadLeona');
+    const entidadSaurio = document.getElementById('entidadSaurio');
+    const btnLeona = document.getElementById('btnLeona');
+    const btnSaurio = document.getElementById('btnSaurio');
     const btnAnimacion = document.getElementById('btnAnimacion');
     
-    let posX = 0;
-    let posY = 0;
-    let posZ = -1.5;
+    let modeloActivo = 'leona';
+    let posX = 0, posY = 0, posZ = -1.5;
     let rotacionY = 0;
     let animacionActiva = false;
 
-    function actualizarPosicion() {
-      modeloEntidad.setAttribute('position', `${posX} ${posY} ${posZ}`);
-      modeloEntidad.setAttribute('rotation', `0 ${rotacionY} 0`);
+    function getModeloActivo() {
+      return modeloActivo === 'leona' ? entidadLeona : entidadSaurio;
     }
+
+    function actualizarPosicion() {
+      const m = getModeloActivo();
+      m.setAttribute('position', `${posX} ${posY} ${posZ}`);
+      m.setAttribute('rotation', `0 ${rotacionY} 0`);
+    }
+
+    // CAMBIAR MODELO
+    btnLeona.addEventListener('click', () => {
+      entidadLeona.setAttribute('visible', 'true');
+      entidadSaurio.setAttribute('visible', 'false');
+      modeloActivo = 'leona';
+      btnLeona.classList.add('activo');
+      btnSaurio.classList.remove('activo');
+      // Restaurar posición
+      posX = 0; posY = 0; posZ = -1.5; rotacionY = 0;
+      actualizarPosicion();
+    });
+
+    btnSaurio.addEventListener('click', () => {
+      entidadLeona.setAttribute('visible', 'false');
+      entidadSaurio.setAttribute('visible', 'true');
+      modeloActivo = 'saurio';
+      btnSaurio.classList.add('activo');
+      btnLeona.classList.remove('activo');
+      // Restaurar posición
+      posX = 0; posY = 0; posZ = -1.5; rotacionY = 0;
+      actualizarPosicion();
+    });
 
     // GIRAR
     document.getElementById('btnGirarIzq').addEventListener('click', () => {
-      rotacionY -= 30;
-      actualizarPosicion();
+      rotacionY -= 30; actualizarPosicion();
     });
     document.getElementById('btnGirarDer').addEventListener('click', () => {
-      rotacionY += 30;
-      actualizarPosicion();
+      rotacionY += 30; actualizarPosicion();
     });
     document.getElementById('btnFrente').addEventListener('click', () => {
-      rotacionY = 0;
-      actualizarPosicion();
+      rotacionY = 0; actualizarPosicion();
     });
 
     // MOVER
     document.getElementById('btnArriba').addEventListener('click', () => {
-      posY += 0.15;
-      actualizarPosicion();
+      posY += 0.15; actualizarPosicion();
     });
     document.getElementById('btnAbajo').addEventListener('click', () => {
-      posY -= 0.15;
-      actualizarPosicion();
+      posY -= 0.15; actualizarPosicion();
     });
     document.getElementById('btnIzquierda').addEventListener('click', () => {
-      posX -= 0.15;
-      actualizarPosicion();
+      posX -= 0.15; actualizarPosicion();
     });
     document.getElementById('btnDerecha').addEventListener('click', () => {
-      posX += 0.15;
-      actualizarPosicion();
+      posX += 0.15; actualizarPosicion();
     });
     document.getElementById('btnAcercar').addEventListener('click', () => {
-      posZ += 0.15;
-      actualizarPosicion();
+      posZ += 0.15; actualizarPosicion();
     });
     document.getElementById('btnAlejar').addEventListener('click', () => {
-      posZ -= 0.15;
-      actualizarPosicion();
+      posZ -= 0.15; actualizarPosicion();
     });
 
     // ANIMACIÓN
     btnAnimacion.addEventListener('click', () => {
       animacionActiva = !animacionActiva;
+      const m = getModeloActivo();
       if (animacionActiva) {
-        modeloEntidad.setAttribute('animation-mixer', 'clip: *; loop: repeat; timeScale: 0.8');
+        m.setAttribute('animation-mixer', 'clip: *; loop: repeat; timeScale: 0.8');
         btnAnimacion.textContent = '⏸ Quieto';
       } else {
-        modeloEntidad.removeAttribute('animation-mixer');
+        m.removeAttribute('animation-mixer');
         btnAnimacion.textContent = '▶️ Vivir';
       }
     });
@@ -256,7 +289,7 @@
             const blob = new Blob(trozos, {type: 'video/webm'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'perene-leona-' + Date.now() + '.webm';
+            a.download = `perene-${modeloActivo}-${Date.now()}.webm`;
             a.click();
             flujo.getTracks().forEach(t => t.stop());
           };
