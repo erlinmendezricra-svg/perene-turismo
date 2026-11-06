@@ -164,8 +164,6 @@
       font-weight: bold;
       font-size: 0.85rem;
     }
-    .cargando { text-align: center; color: #666; padding: 30px; font-size: 0.95rem; }
-    .error { color: red; text-align: center; padding: 30px; }
   </style>
 </head>
 <body>
@@ -175,7 +173,7 @@
     <div class="enlaces">
       <a href="#">Inicio</a>
       <a href="#atractivos">Atractivos</a>
-      <a href="#">Proyecto</a>
+      <a href="ra.html">Realidad Aumentada</a>
     </div>
   </nav>
 
@@ -218,45 +216,74 @@
   <!-- ATRACTIVOS -->
   <section class="atractivos" id="atractivos">
     <h2>Atractivos de Perené</h2>
-    <div id="lista-lugares">
-      <p class="cargando">Cargando atractivos...</p>
-    </div>
+    <div id="lista-lugares"></div>
   </section>
 
   <script>
-    fetch('/api/atractivos')
-      .then(res => res.json())
-      .then(lugares => {
-        const excluir = ['Corona', 'Estatua', 'Parque Perené', 'PARK-PERENÉ'];
-        const filtrados = lugares.filter(lugar => !excluir.includes(lugar.nombre));
-        const contenedor = document.getElementById('lista-lugares');
-        contenedor.innerHTML = '';
-        
-        filtrados.forEach(lugar => {
-          const tarjeta = document.createElement('div');
-          tarjeta.className = 'tarjeta';
-          const rutaImg = lugar.imagen_principal 
-            ? `/${lugar.imagen_principal}` 
-            : 'img/catarata.jpg';
-          
-          tarjeta.innerHTML = `
-            <img src="${rutaImg}" alt="${lugar.nombre}" loading="lazy">
-            <div class="tarjeta-contenido">
-              <h3>${lugar.nombre}</h3>
-              <p>${(lugar.descripcion || '').substring(0, 70)}...</p>
-              <div class="botones">
-                <a href="/lugar/${lugar.id_lugar}" class="btn-ver">Ver detalles</a>
-                <a href="/api/qr/${lugar.id_lugar}" target="_blank" class="btn-qr">QR</a>
-              </div>
-            </div>
-          `;
-          contenedor.appendChild(tarjeta);
-        });
-      })
-      .catch(err => {
-        const contenedor = document.getElementById('lista-lugares');
-        contenedor.innerHTML = `<p class="error">Error cargando datos: ${err.message}</p>`;
-      });
+    // DATOS DE LOS ATRACTIVOS (funciona sin servidor)
+    const lugares = [
+      {
+        nombre: "Boca Tigre",
+        descripcion: "Impresionante espacio natural donde se unen dos ríos. Abierto todo el día.",
+        imagen: "img/boca_tigre.jpg"
+      },
+      {
+        nombre: "Catarata",
+        descripcion: "Belleza natural con caída de agua rodeada de vegetación exuberante.",
+        imagen: "img/catarata.jpg"
+      },
+      {
+        nombre: "Cueva La Olada",
+        descripcion: "Fascinante formación natural con historia y belleza geológica.",
+        imagen: "img/caverna_la_olada.jpg"
+      },
+      {
+        nombre: "Fundo San Isidro",
+        descripcion: "Espacio natural con paisajes tranquilos y riqueza ambiental.",
+        imagen: "img/fundo_san_isidro.jpg"
+      },
+      {
+        nombre: "Juan Santos Atahualpa",
+        descripcion: "Lugar con valor histórico y cultural para la comunidad.",
+        imagen: "img/juan_santos_atahualpa.jpg"
+      },
+      {
+        nombre: "Mirador",
+        descripcion: "Vista panorámica espectacular del valle y los ríos de Perené.",
+        imagen: "img/mirador.jpg"
+      },
+      {
+        nombre: "Piscina",
+        descripcion: "Espacio recreativo natural ideal para familias y descanso.",
+        imagen: "img/piscina.jpg"
+      },
+      {
+        nombre: "Velo de la Novia",
+        descripcion: "Hermosa catarata con encanto natural y leyenda local.",
+        imagen: "img/velo_de_la_novia.jpg"
+      }
+    ];
+
+    // MOSTRAR LAS TARJETAS
+    const contenedor = document.getElementById('lista-lugares');
+    
+    lugares.forEach(lugar => {
+      const tarjeta = document.createElement('div');
+      tarjeta.className = 'tarjeta';
+      
+      tarjeta.innerHTML = `
+        <img src="${lugar.imagen}" alt="${lugar.nombre}" loading="lazy">
+        <div class="tarjeta-contenido">
+          <h3>${lugar.nombre}</h3>
+          <p>${lugar.descripcion.substring(0, 70)}...</p>
+          <div class="botones">
+            <a href="ra.html" class="btn-ver">Ver RA</a>
+            <a href="lugar.html" class="btn-qr">Detalles</a>
+          </div>
+        </div>
+      `;
+      contenedor.appendChild(tarjeta);
+    });
   </script>
 </body>
 </html>
