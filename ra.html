@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR Perené - Todos los Animales</title>
+  
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    
+    .info {
+      position: absolute; top: 5px; left: 5px;
+      background: rgba(0,0,0,0.8); color: #0f0;
+      padding: 12px; border-radius: 8px; font-size: 12px;
+      z-index: 99999; max-width: 300px;
+    }
+    
+    .ui {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 9999; pointer-events: none;
+    }
+    .ui > * { pointer-events: auto; }
+    
+    .selector {
+      position: absolute; top: 15px; left: 50%;
+      transform: translateX(-50%);
+    }
+    .btn-animal {
+      background: #4f46e5; color: white; border: none;
+      padding: 12px 24px; border-radius: 12px;
+      font-size: 1rem; font-weight: bold; cursor: pointer;
+    }
+    .lista {
+      position: absolute; top: 60px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.9); border-radius: 10px;
+      padding: 8px; display: none; flex-direction: column; gap: 4px;
+    }
+    .lista.abierta { display: flex; }
+    .opcion {
+      background: transparent; color: white; border: none;
+      padding: 10px 16px; border-radius: 6px;
+      cursor: pointer; font-size: 0.95rem;
+    }
+    .opcion:hover, .opcion.activo { background: rgba(255,255,255,0.2); }
+    
+    .botones {
+      position: absolute; bottom: 20px; left: 50%;
+      transform: translateX(-50%); display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .btn {
+      padding: 12px 16px; border: none; border-radius: 10px;
+      font-weight: bold; cursor: pointer;
+      font-size: 0.9rem;
+      min-height: 48px;
+    }
+    .btn-azul { background: #2563eb; color: white; }
+    .btn-morado { background: #7c3aed; color: white; }
+    .btn-naranja { background: #f59e0b; color: white; }
+    .btn-verde { background: #16a34a; color: white; }
+    .btn-rojo { background: #dc2626; color: white; }
+    
+    .mover {
+      position: absolute; right: 15px; top: 50%;
+      transform: translateY(-50%); display: flex; flex-direction: column; gap: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="info" id="info">🔄 Cargando modelos...</div>
+
+  <div class="ui">
+    <div class="selector">
+      <button class="btn-animal" id="btnSel">🦖 Triceráps ▾</button>
+      <div class="lista" id="lista">
+        <button class="opcion activo" data-animal="saurio">🦖 Triceráps</button>
+        <button class="opcion" data-animal="leona">🦁 Leona</button>
+        <button class="opcion" data-animal="lobo">🐺 Lobo</button>
+        <button class="opcion" data-animal="cocodrilo">🐊 Cocodrilo</button>
+        <button class="opcion" data-animal="conejo">🐰 Conejo</button>
+      </div>
+    </div>
+
+    <div class="mover">
+      <button class="btn btn-azul" id="arr">⬆️</button>
+      <button class="btn btn-azul" id="izq">⬅️</button>
+      <button class="btn btn-azul" id="mas">🔍+</button>
+      <button class="btn btn-azul" id="der">➡️</button>
+      <button class="btn btn-azul" id="aba">⬇️</button>
+      <button class="btn btn-azul" id="men">🔍-</button>
+    </div>
+
+    <div class="botones">
+      <button class="btn btn-morado" id="gizq">↺ Izq</button>
+      <button class="btn btn-morado" id="fre">🔄 Frente</button>
+      <button class="btn btn-morado" id="gder">↻ Der</button>
+      <button class="btn btn-naranja" id="btnAnim">▶️ Caminar</button>
+      <button class="btn btn-verde" id="pau">⏸ Parar</button>
+      <button class="btn btn-rojo" id="gra">⏺ Grabar</button>
+    </div>
+  </div>
+
+  <a-scene
+    arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
+    vr-mode-ui="enabled: false">
+    
+    <a-assets timeout="300000">
+      <a-asset-item id="saurio" src="/ar/saurio.glb"></a-asset-item>
+      <a-asset-item id="leona" src="/ar/leona.glb"></a-asset-item>
+      <a-asset-item id="lobo" src="/ar/lobo.glb"></a-asset-item>
+      <a-asset-item id="cocodrilo" src="/ar/cocodrilo.glb"></a-asset-item>
+      <a-asset-item id="conejo" src="/ar/conejo.glb"></a-asset-item>
+    </a-assets>
+
+    <!-- TRICERÁPS - INICIO -->
+    <a-entity id="e-saurio"
+              scale="0.6 0.6 0.6"
+              position="0 0 -1.8"
+              gltf-model="#saurio"
+              animation-mixer="clip: *; loop: repeat; timeScale: 1.0">
+    </a-entity>
+
+    <!-- LEONA -->
+    <a-entity id="e-leona"
+              scale="0.6 0.6 0.6"
+              position="0 0 -1.8"
+              gltf-model="#leona"
+              visible="false"
+              animation-mixer="clip: *; loop: repeat; timeScale: 1.0">
+    </a-entity>
+
+    <!-- LOBO -->
+    <a-entity id="e-lobo"
+              scale="0.6 0.6 0.6"
+              position="0 0 -1.8"
+              gltf-model="#lobo"
+              visible="false"
+              animation-mixer="clip: *; loop: repeat; timeScale: 1.0">
+    </a-entity>
+
+    <!-- COCODRILO -->
+    <a-entity id="e-cocodrilo"
+              scale="0.6 0.6 0.6"
+              position="0 0 -1.8"
+              gltf-model="#cocodrilo"
+              visible="false"
+              animation-mixer="clip: *; loop: repeat; timeScale: 1.0">
+    </a-entity>
+
+    <!-- CONEJO -->
+    <a-entity id="e-conejo"
+              scale="0.6 0.6 0.6"
+              position="0 0 -1.8"
+              gltf-model="#conejo"
+              visible="false"
+              animation-mixer="clip: *; loop: repeat; timeScale: 1.0">
+    </a-entity>
+
+    <a-camera far="100" near="0.1" fov="60"></a-camera>
+    <a-light type="ambient" intensity="1.8"></a-light>
+    <a-light type="directional" position="5 5 5" intensity="1.5"></a-light>
+  </a-scene>
+
+  <script>
+    const info = document.getElementById('info');
+    const inicio = { x: 0, y: 0, z: -1.8, r: 0 };
+    const pos = { 
+      saurio: { ...inicio },
+      leona: { ...inicio }, 
+      lobo: { ...inicio }, 
+      cocodrilo: { ...inicio }, 
+      conejo: { ...inicio } 
+    };
+
+    let actual = 'saurio';
+    let anim = true;
+    
+    // TIPOS DE MOVIMIENTO - cambia con el botón naranja
+    const listaAnim = ['Caminar', 'Correr', 'Quieto', 'Todas'];
+    let indiceAnim = 0;
+
+    // VERIFICAR CARGA
+    const archivos = document.querySelectorAll('a-asset-item');
+    let ok = 0;
+    
+    archivos.forEach(a => {
+      const id = a.getAttribute('id');
+      const ruta = a.getAttribute('src');
+      
+      a.addEventListener('loaded', () => {
+        ok++;
+        info.textContent = `✅ ${ok}/${archivos.length} — ${id} listo ✅`;
+        info.style.color = '#0f0';
+      });
+      
+      a.addEventListener('error', () => {
+        info.innerHTML += `<br>❌ FALTA: ${ruta}`;
+        info.style.color = '#f55';
+      });
+    });
+
+    // CAMBIAR DE ANIMAL
+    function mostrar(nombre) {
+      // OCULTAR TODOS
+      ['saurio','leona','lobo','cocodrilo','conejo'].forEach(t => {
+        document.getElementById('e-'+t).setAttribute('visible', t === nombre);
+      });
+      
+      // RESETEAR AL CENTRO
+      pos[nombre] = { ...inicio };
+      const entidad = document.getElementById('e-'+nombre);
+      entidad.setAttribute('position', `${inicio.x} ${inicio.y} ${inicio.z}`);
+      entidad.setAttribute('rotation', `0 ${inicio.r} 0`);
+      entidad.setAttribute('scale', '0.6 0.6 0.6');
+
+      actual = nombre;
+      
+      // Cambiar texto del botón principal
+      const nombres = {
+        saurio: '🦖 Triceráps',
+        leona: '🦁 Leona',
+        lobo: '🐺 Lobo',
+        cocodrilo: '🐊 Cocodrilo',
+        conejo: '🐰 Conejo'
+      };
+      document.getElementById('btnSel').textContent = nombres[nombre] + ' ▾';
+      
+      document.querySelectorAll('.opcion').forEach(o => o.classList.remove('activo'));
+      document.querySelector(`[data-animal="${nombre}"]`).classList.add('activo');
+      document.getElementById('lista').classList.remove('abierta');
+
+      // ACTIVAR ANIMACIÓN
+      if (anim) aplicarAnim();
+    }
+
+    // APLICAR MOVIMIENTO SELECCIONADO
+    function aplicarAnim() {
+      const entidad = document.getElementById('e-'+actual);
+      entidad.removeAttribute('animation-mixer');
+      
+      setTimeout(() => {
+        // Usamos * para que funcione con cualquier animación del modelo
+        entidad.setAttribute('animation-mixer', {
+          clip: '*',
+          loop: 'repeat',
+          timeScale: indiceAnim === 1 ? 1.5 : 1.0 // Más rápido = Correr
+        });
+        document.getElementById('btnAnim').textContent = '▶️ ' + listaAnim[indiceAnim];
+        console.log(`[${actual}] Movimiento: ${listaAnim[indiceAnim]}`);
+      }, 100);
+    }
+
+    // BOTÓN CAMBIAR MOVIMIENTO
+    document.getElementById('btnAnim').onclick = () => {
+      indiceAnim = (indiceAnim + 1) % listaAnim.length;
+      aplicarAnim();
+    };
+
+    // SELECTOR DE ANIMAL
+    document.getElementById('btnSel').onclick = e => {
+      e.stopPropagation();
+      document.getElementById('lista').classList.toggle('abierta');
+    };
+    document.addEventListener('click', () => document.getElementById('lista').classList.remove('abierta'));
+    document.querySelectorAll('.opcion').forEach(o => {
+      o.onclick = () => mostrar(o.dataset.animal);
+    });
+
+    // ACTUALIZAR POSICIÓN
+    function act() {
+      const p = pos[actual];
+      document.getElementById('e-'+actual).setAttribute('position', `${p.x} ${p.y} ${p.z}`);
+      document.getElementById('e-'+actual).setAttribute('rotation', `0 ${p.r} 0`);
+    }
+
+    // BOTONES DE MOVIMIENTO
+    document.getElementById('gizq').onclick = () => { pos[actual].r -= 30; act(); };
+    document.getElementById('gder').onclick = () => { pos[actual].r += 30; act(); };
+    document.getElementById('fre').onclick = () => { pos[actual].r = 0; act(); };
+    document.getElementById('arr').onclick = () => { pos[actual].y += 0.15; act(); };
+    document.getElementById('aba').onclick = () => { pos[actual].y -= 0.15; act(); };
+    document.getElementById('izq').onclick = () => { pos[actual].x -= 0.15; act(); };
+    document.getElementById('der').onclick = () => { pos[actual].x += 0.15; act(); };
+    document.getElementById('mas').onclick = () => { pos[actual].z += 0.15; act(); };
+    document.getElementById('men').onclick = () => { pos[actual].z -= 0.15; act(); };
+
+    // PARAR / REANUDAR
+    document.getElementById('pau').onclick = () => {
+      anim = !anim;
+      const e = document.getElementById('e-'+actual);
+      if (anim) {
+        aplicarAnim();
+        document.getElementById('pau').textContent = '⏸ Parar';
+      } else {
+        e.removeAttribute('animation-mixer');
+        document.getElementById('pau').textContent = '▶️ Andar';
+      }
+    };
+
+    // GRABAR
+    document.getElementById('gra').onclick = async () => {
+      try {
+        const s = await navigator.mediaDevices.getDisplayMedia({video: true});
+        const rec = new MediaRecorder(s), t = [];
+        rec.ondataavailable = e => e.data.size && t.push(e.data);
+        rec.onstop = () => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(new Blob(t, {type:'video/webm'}));
+          a.download = `${actual}-${Date.now()}.webm`;
+          a.click(); 
+          s.getTracks().forEach(x => x.stop());
+        };
+        rec.start();
+      } catch { 
+        alert('Permite grabar cuando el navegador lo pida'); 
+      }
+    };
+  </script>
+</body>
+</html>
